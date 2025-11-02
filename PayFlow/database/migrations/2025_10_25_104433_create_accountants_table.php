@@ -12,9 +12,26 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('accountants', function (Blueprint $table) {
-            $table->id();
+             $table->id('accountant_id');
+    
+            // Foreign key to employees
+            $table->unsignedBigInteger('employee_id'); 
+            $table->foreign('employee_id')
+                    ->references('employee_id')
+                    ->on('employees')
+                    ->cascadeOnDelete();
+
+            $table->string('employee_no')->unique(); 
+            $table->string('first_name');
+            $table->string('last_name');
+            $table->string('email')->unique();
+            $table->string('contact_number')->nullable();
+            $table->string('address')->nullable();
+            $table->date('date_hired')->nullable();
+            $table->decimal('salary', 10, 2)->nullable();
             $table->timestamps();
-        });
+});
+
     }
 
     /**

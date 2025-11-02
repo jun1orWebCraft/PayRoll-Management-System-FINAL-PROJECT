@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Login — PayFlow</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -128,45 +129,45 @@
     </div>
 
     <div class="right-side">
-        <div class="card shadow-lg">
-            <div class="card-body">
-                <h4>Welcome Back</h4>
+    <div class="card shadow-lg">
+        <div class="card-body">
+            <h4>Welcome Back</h4>
 
-                @if(session('status'))
-                    <div class="alert alert-success">{{ session('status') }}</div>
-                @endif
+            @if(session('status'))
+                <div class="alert alert-success">{{ session('status') }}</div>
+            @endif
 
-                <form method="POST" action="{{ route('login') }}">
-                    @csrf
+            <form method="POST" action="{{ route('login') }}">
+                @csrf
 
-                    <div class="mb-3 text-start">
-                        <label for="email" class="form-label">Email</label>
-                        <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" required autofocus>
-                        @error('email') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
-                    </div>
+                <div class="mb-3 text-start">
+                    <label for="email" class="form-label">Email</label>
+                    <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" required autofocus>
+                    @error('email') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                </div>
 
-                    <div class="mb-3 text-start">
-                        <label for="password" class="form-label">Password</label>
-                        <input id="password" type="password" class="form-control" name="password" required>
-                        @error('password') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
-                    </div>
+                <div class="mb-3 text-start">
+                    <label for="password" class="form-label">Password</label>
+                    <input id="password" type="password" class="form-control" name="password" required>
+                    @error('password') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                </div>
 
-                    <div class="mb-3 form-check text-start">
-                        <input type="checkbox" name="remember_token" id="remember_token" class="form-check-input">
-                        <label class="form-check-label" for="remember_token">Remember me</label>
-                    </div>
+                <div class="mb-3 form-check text-start">
+                    <input type="checkbox" name="remember" id="remember" class="form-check-input">
+                    <label class="form-check-label" for="remember">Remember me</label>
+                </div>
 
-                    <div class="d-grid mb-3">
-                        <button class="btn btn-primary btn-lg">Login</button>
-                    </div>
+                <div class="d-grid mb-3">
+                    <button class="btn btn-primary btn-lg">Login</button>
+                </div>
 
-                    <div>
-                        <a href="{{ route('password.request') }}">Forgot your password?</a>
-                    </div>
-                </form>
-            </div>
+                <div>
+                    <a href="{{ route('password.request') }}">Forgot your password?</a>
+                </div>
+            </form>
         </div>
     </div>
+</div>
 
 </body>
 </html>

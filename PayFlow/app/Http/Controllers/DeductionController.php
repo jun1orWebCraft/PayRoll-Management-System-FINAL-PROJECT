@@ -3,63 +3,42 @@
 namespace App\Http\Controllers;
 
 use App\Models\Deduction;
-use Illuminate\Http\Request;
+use App\Models\DeductionType;
+use App\Models\Employee;
 
 class DeductionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function deduction()
     {
-        //
+        // Fetch all deductions
+        $deductions = Deduction::orderBy('created_at', 'desc')->get();
+
+        // Fetch all full-time employees only
+        $employees = Employee::where('employment_type', 'Full-Time')->get();
+
+        // Fetch all available deduction types (Tax, SSS, PhilHealth, etc.)
+        $deductionTypes = DeductionType::all();
+
+        // Send to view
+        return view('accountant.deduction', compact('deductions', 'employees', 'deductionTypes'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
-    {
-        //
-    }
+{
+    $request->validate([
+        'employee_id' => 'required|exists:employees,id',
+        'type_id' => 'required|exists:types,id',
+        'amount' => 'required|numeric|min:0',
+    ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Deduction $deduction)
-    {
-        //
-    }
+    Deduction::create([
+        'employee_id' => $request->employee_id,
+        'type_id' => $request->type_id,
+        'amount' => $request->amount,
+    ]);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Deduction $deduction)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Deduction $deduction)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Deduction $deduction)
-    {
-        //
-    }
+    return redirect()->route('accountant.deduction')->with('success', 'Deduction added successfully!');
 }
+
+}
+

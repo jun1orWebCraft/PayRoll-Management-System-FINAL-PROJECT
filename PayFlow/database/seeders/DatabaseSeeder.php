@@ -30,7 +30,15 @@ class DatabaseSeeder extends Seeder
             ]
         );
  
-
+        // Seed accountant user
+        User::firstOrCreate(
+            ['email' => 'accountant@gmail.com'],
+            [
+                'name' => 'Accountant',
+                'password' => Hash::make('accountant123'),
+                'email_verified_at' => now(),
+            ]
+        );
        
     }
 }

@@ -8,10 +8,9 @@
   {{-- ✅ Bootstrap CSS --}}
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  {{-- ✅ Bootstrap Icons --}}
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
-  {{-- ✅ Your custom app layout CSS --}}
   <link rel="stylesheet" href="{{ asset('css/applayout.css') }}">
 
   <style>
@@ -142,25 +141,32 @@ main {
       </div>
 
       <nav>
-        <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-          <span class="icon"><i class="bi bi-house-door-fill"></i></span><span>Dashboard</span>
-        </a>
-        <a href="{{ route('employees.index') }}" class="nav-link {{ request()->routeIs('employees.*') ? 'active' : '' }}">
-          <span class="icon"><i class="bi bi-people-fill"></i></span><span>Employees</span>
-        </a>
-        <a href="{{ route('attendance.index') }}" class="nav-link {{ request()->routeIs('attendance.*') ? 'active' : '' }}">
-          <span class="icon"><i class="bi bi-clock-fill"></i></span><span>Attendance</span>
-        </a>
-        <a href="{{ route('taxanddeductions') }}" class="nav-link {{ request()->routeIs('taxanddeductions') ? 'active' : '' }}">
-          <span class="icon"><i class="bi bi-receipt"></i></span><span>Tax & Deductions</span>
-        </a>
-        <a href="{{ route('reports') }}" class="nav-link {{ request()->routeIs('reports') ? 'active' : '' }}">
-          <span class="icon"><i class="bi bi-bar-chart-fill"></i></span><span>Reports</span>
-        </a>
-        <a href="{{ route('settings') }}" class="nav-link {{ request()->routeIs('settings') ? 'active' : '' }}">
-          <span class="icon"><i class="bi bi-gear-fill"></i></span><span>Settings</span>
-        </a>
-      </nav>
+    <a href="{{ route('accountant.dashboard') }}" 
+       class="nav-link {{ request()->routeIs('accountant.dashboard') ? 'active' : '' }}">
+        <span class="icon"><i class="bi bi-house-door-fill"></i></span>
+        <span>Dashboard</span>
+    </a>
+
+    <a href="{{ route('accountant.payrollprocessing') }}" 
+       class="nav-link {{ request()->routeIs('accountant.payrollprocessing') ? 'active' : '' }}">
+        <span class="icon"><i class="bi bi-credit-card-fill"></i></span>
+        <span>Payroll Processing</span>
+    </a>
+
+    <a href="{{ route('accountant.deductions') }}" 
+       class="nav-link {{ request()->routeIs('accountant.deductions') ? 'active' : '' }}">
+        <span class="icon"><i class="bi bi-cash-stack"></i></span>
+        <span>Deductions</span>
+    </a>
+
+    <a href="{{ route('accountant.settings') }}" 
+       class="nav-link {{ request()->routeIs('accountant.settings') ? 'active' : '' }}">
+        <span class="icon"><i class="bi bi-gear-fill"></i></span>
+         <span>Settings</span>
+    </a>
+
+</nav>
+
 
       <div class="sidebar-footer">
         @if (Auth::check())
