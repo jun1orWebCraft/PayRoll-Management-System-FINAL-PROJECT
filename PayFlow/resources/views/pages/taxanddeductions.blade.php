@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'TAX AND DEDUCTIONS')
+@section('title', 'Payroll Data')
 
 @section('content')
   
