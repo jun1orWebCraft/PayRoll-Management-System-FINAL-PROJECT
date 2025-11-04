@@ -171,3 +171,12 @@
 
 </body>
 </html>
+<script>
+    if (window.history && window.history.pushState) {
+        window.history.pushState(null, null, window.location.href);
+        window.onpopstate = function () {
+            window.location.href = "{{ Auth::guard('employee')->check() ? route('employee.dashboard') : route('dashboard') }}";
+        };
+    }
+</script>
+

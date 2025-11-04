@@ -8,8 +8,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Encoding\Encoding;
+use Illuminate\Support\Facades\Mail;
 use Endroid\QrCode\Writer\PngWriter;
-
+use App\Mail\EmployeeWelcomeMail;
 
 
 class EmployeeController extends Controller
@@ -61,7 +62,7 @@ class EmployeeController extends Controller
 
 
 
-public function store(Request $request)
+  public function store(Request $request)
 {
     $request->validate([
         'first_name' => 'required|string|max:255',
@@ -77,14 +78,16 @@ public function store(Request $request)
         'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
     ]);
 
+    // Generate Employee number and random password
     $employee_no = Employee::generateEmployeeNo();
     $randomPassword = substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()'), 0, 8);
 
+    // Handle profile picture upload
     $profilePicturePath = $request->hasFile('profile_picture') 
         ? $request->file('profile_picture')->store('profile_pictures', 'public') 
         : null;
 
-    // Generate QR code using Endroid (pure PHP)
+    // Generate QR code
     $result = Builder::create()
         ->writer(new PngWriter())
         ->data($employee_no)
@@ -94,7 +97,8 @@ public function store(Request $request)
 
     $qrCodeBase64 = 'data:image/png;base64,' . base64_encode($result->getString());
 
-    Employee::create([
+    // ✅ Save employee
+    $employee = Employee::create([
         'employee_no' => $employee_no,
         'QR_code' => $qrCodeBase64,
         'first_name' => $request->first_name,
@@ -111,8 +115,20 @@ public function store(Request $request)
         'profile_picture' => $profilePicturePath,
     ]);
 
-    return redirect()->route('employees.index')->with('success', 'Employee added successfully.');
+    // ✅ Send welcome email with credentials
+    try {
+        Mail::to($employee->email)->send(new EmployeeWelcomeMail($employee, $randomPassword, $qrCodeBase64, null));
+    } catch (\Exception $e) {
+        // Optionally log or handle email sending failure
+        \Log::error('Failed to send email: '.$e->getMessage());
+    }
+
+    return redirect()
+        ->route('employees.index')
+        ->with('success', 'Employee added successfully and welcome email sent.');
 }
+
+
 
 
 
@@ -192,4 +208,26 @@ public function store(Request $request)
 
         return redirect()->route('employees.index')->with('success', 'Employee deleted successfully.');
     }
+
+
+    public function dashboard()
+    {
+        return view('employeepages.dashboard');
+    }
+
+    public function profile()
+    {
+        return view('employeepages.profile');
+    }
+
+    public function settings()
+    {
+        return view('employeepages.settings');
+    }
+
+    public function request()
+    {
+        return view('employeepages.settings');
+    }
+  
 }
