@@ -35,7 +35,7 @@
         <table class="table table-hover align-middle text-center mb-0">
             <thead class="table-primary">
                 <tr>
-                    
+                    <th>Date</th>
                     <th>Employee No</th>
                     <th>Employee Name</th>
                     <th>Time In</th> 
@@ -48,7 +48,7 @@
             <tbody>
                 @forelse ($attendances as $attendance)
                 <tr>
-                    
+                    <td>{{ $attendance->date}}</td>
                     <td>{{ $attendance->employee->employee_no ?? '-' }}</td>
                     <td class="fw-semibold">{{ $attendance->employee->first_name ?? '' }} {{ $attendance->employee->last_name ?? '' }}</td>
                     <td>{{ $attendance->time_in ? \Carbon\Carbon::parse($attendance->time_in)->format('h:i A') : '-' }}</td>
