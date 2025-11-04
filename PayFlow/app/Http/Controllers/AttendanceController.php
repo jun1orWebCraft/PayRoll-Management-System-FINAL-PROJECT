@@ -71,8 +71,13 @@ class AttendanceController extends Controller
                 ]);
                 $message = "✅ Time In recorded for {$employee->first_name} {$employee->last_name}";
             } elseif (!$todayRecord->time_out) {
+
+                $timeIn = Carbon::parse($todayRecord->time_in);
+                $totalHours = $timeIn->diffInMinutes($now) / 60;
+
                 $todayRecord->update([
                     'time_out' => $now,
+                    'total_hours' => round($totalHours, 2),
                 ]);
                 $message = "👋 Time Out recorded for {$employee->first_name} {$employee->last_name}";
             } else {

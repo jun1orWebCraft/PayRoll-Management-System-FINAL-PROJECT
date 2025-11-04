@@ -35,11 +35,12 @@
         <table class="table table-hover align-middle text-center mb-0">
             <thead class="table-primary">
                 <tr>
-                    <th>ID</th>
+                    
                     <th>Employee No</th>
                     <th>Employee Name</th>
                     <th>Time In</th> 
                     <th>Time Out</th>
+                    <th>Total Work Hour</th>
                     <th>Status</th>
                     <th>Actions</th>
                 </tr>
@@ -47,12 +48,12 @@
             <tbody>
                 @forelse ($attendances as $attendance)
                 <tr>
-                    <td>{{ $attendance->attendance_id }}</td>
+                    
                     <td>{{ $attendance->employee->employee_no ?? '-' }}</td>
                     <td class="fw-semibold">{{ $attendance->employee->first_name ?? '' }} {{ $attendance->employee->last_name ?? '' }}</td>
                     <td>{{ $attendance->time_in ? \Carbon\Carbon::parse($attendance->time_in)->format('h:i A') : '-' }}</td>
                     <td>{{ $attendance->time_out ? \Carbon\Carbon::parse($attendance->time_out)->format('h:i A') : '-' }}</td>
-
+                    <td>{{ $attendance->total_hours }}</td>
                     <td>
                         @php
                             $status = $attendance->time_in ? ($attendance->time_out ? 'Present' : 'Late') : 'Absent';
