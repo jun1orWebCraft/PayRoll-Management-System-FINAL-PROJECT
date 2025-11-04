@@ -227,7 +227,7 @@ class EmployeeController extends Controller
 
     public function request()
     {
-        return view('employeepages.settings');
+        return view('employeepages.request');
     }
   
 }
