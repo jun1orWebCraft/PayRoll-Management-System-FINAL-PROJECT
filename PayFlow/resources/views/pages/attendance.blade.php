@@ -67,21 +67,6 @@
                         @endif
                     </td>
                     <td>
-                        {{-- View --}}
-                        <button class="btn btn-link text-primary p-0 border-0 shadow-none me-2" 
-                                data-bs-toggle="modal" 
-                                data-bs-target="#employeeDetailsModal{{ $attendance->employee->id ?? '' }}">
-                            <i class="bi bi-eye fs-5"></i>
-                        </button>
-
-                        {{-- Edit --}}
-                        <button class="btn btn-link text-warning p-0 border-0 shadow-none me-2"
-                                data-bs-toggle="modal"
-                                data-bs-target="#editAttendanceModal{{ $attendance->id }}">
-                            <i class="bi bi-pencil fs-5"></i>
-                        </button>
-
-                        {{-- Delete --}}
                         <form action="{{ route('attendance.destroy', $attendance->attendance_id) }}" method="POST" class="d-inline">
                             @csrf
                             @method('DELETE')
