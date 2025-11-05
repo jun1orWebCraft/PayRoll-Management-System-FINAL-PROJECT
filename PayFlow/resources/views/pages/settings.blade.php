@@ -17,33 +17,46 @@
     <div class="row g-4">
         {{-- Account Settings --}}
         <div class="col-md-6">
-            <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
-                <div class="d-flex align-items-center mb-3">
-                    <i class="bi bi-person-circle fs-4 text-primary me-2"></i>
-                    <h5 class="fw-bold mb-0">Account Settings</h5>
-                </div>
-                <p class="text-muted small mb-3">Update your personal details and login credentials</p>
-
-                <form>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Full Name</label>
-                        <input type="text" class="form-control rounded-3" value="{{ auth()->user()->name }}" readonly>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Email Address</label>
-                        <input type="email" class="form-control rounded-3" value="{{ auth()->user()->email }}" readonly>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Change Password</label>
-                        <input type="password" class="form-control rounded-3" placeholder="Enter new password">
-                    </div>
-
-                    <button type="submit" class="btn btn-primary rounded-3 w-100">Update Account</button>
-                </form>
-            </div>
+    <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+        <div class="d-flex align-items-center mb-3">
+            <i class="bi bi-person-circle fs-4 text-primary me-2"></i>
+            <h5 class="fw-bold mb-0">Account Settings</h5>
         </div>
+        <p class="text-muted small mb-3">Update your login credentials</p>
+
+        @if(session('status'))
+            <div class="alert alert-success">{{ session('status') }}</div>
+        @endif
+
+        <form action="{{ route('hr.update-password') }}" method="POST">
+            @csrf
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Current Password</label>
+                <input type="password" name="current_password" class="form-control rounded-3 @error('current_password') is-invalid @enderror" required>
+                @error('current_password')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">New Password</label>
+                <input type="password" name="new_password" class="form-control rounded-3 @error('new_password') is-invalid @enderror" required>
+                @error('new_password')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Confirm New Password</label>
+                <input type="password" name="new_password_confirmation" class="form-control rounded-3" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary rounded-3 w-100">Update Password</button>
+        </form>
+    </div>
+</div>
+
 
         {{-- System Settings --}}
         <div class="col-md-6">

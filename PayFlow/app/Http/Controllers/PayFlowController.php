@@ -10,6 +10,9 @@ use App\Models\Attendance;
 use App\Models\Deduction;
 use App\Models\Payroll;
 use App\Models\ActivityLog;
+use Illuminate\Support\Facades\Hash;
+
+
 class PayFlowController extends Controller
 {
 public function dashboard()   
@@ -124,5 +127,23 @@ public function dashboard()
         return view('pages.settings');
     }
 
+    public function updatePassword(Request $request)
+{
+    $request->validate([
+        'current_password' => 'required',
+        'new_password' => 'required|confirmed|min:8',
+    ]);
+
+    $user = auth()->user(); // HR user
+
+    if (! Hash::check($request->current_password, $user->password)) {
+        return back()->withErrors(['current_password' => 'Current password is incorrect.']);
+    }
+
+    $user->password = Hash::make($request->new_password);
+    $user->save();
+
+    return back()->with('status', 'Password updated successfully.');
+}
 
 }

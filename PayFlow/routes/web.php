@@ -50,7 +50,8 @@ Route::middleware('web')->group(function () {
         Route::get('/taxanddeductions', [PayFlowController::class, 'taxanddeductions'])->name('taxanddeductions');
         Route::get('/reports', [PayFlowController::class, 'reports'])->name('reports');
         Route::get('/settings', [PayFlowController::class, 'settings'])->name('settings');
-
+        
+        Route::post('/settings/update-password', [PayFlowController::class, 'updatePassword'])->name('hr.update-password');
         Route::resource('employees', EmployeeController::class);
         Route::resource('attendance', AttendanceController::class);
     });
