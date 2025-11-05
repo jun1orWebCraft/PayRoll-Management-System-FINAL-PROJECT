@@ -16,7 +16,7 @@
             : asset('images/default-profile.png') }}"
     alt="Profile Picture"
     class="rounded-circle border border-3 border-white shadow-sm position-absolute"
-    style="width:170px; height:170px; top:30px; left:50%; transform:translateX(-50%);">
+    style="width:180px; height:170px; top:30px; left:50%; transform:translateX(-50%);">
 
                     <div class="mt-5 pt-5">
                         <h4 class="fw-bold">{{ $employee->full_name }}</h4>
