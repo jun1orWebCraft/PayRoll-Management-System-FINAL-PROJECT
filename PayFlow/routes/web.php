@@ -88,7 +88,7 @@ Route::middleware('web')->group(function () {
                 ->name('employee.settings');
             
             Route::resource('employee', EmployeeController::class);
-            Route::post('/profile/update', [EmployeeController::class, 'updateProfile'])->name('employee.updateProfile');
+            
         });
     });
 
