@@ -9,7 +9,7 @@
     <div class="mb-4 border-bottom pb-3">
         <div class="d-flex align-items-center justify-content-between flex-wrap">
             <div>
-                <h4 class="fw-bold mb-1">Welcome Back, <span class="text-primary">{{ Auth::user()->name ?? 'HR' }}</span> </h4>
+                <h4 class="fw-bold mb-1">Welcome Back, <span class="">{{ Auth::user()->name ?? 'HR' }}</span> </h4>
                 <p class="text-muted mb-0">
                     We’re glad to see you again — here’s what’s happening at <strong>PayFlow</strong> today.
                 </p>
@@ -31,8 +31,8 @@
             <div class="card bg-white text-dark border-0 shadow-sm rounded-4 p-4">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <h6 class="text-muted mb-0">Total Employees</h6>
-                    <div class="rounded-circle bg-primary bg-opacity-10 p-2">
-                        <i class="bi bi-people fs-5 text-primary"></i>
+                    <div class="rounded-circle bg-secondary bg-opacity-10 p-2">
+                        <i class="bi bi-people fs-5 "></i>
                     </div>
                 </div>
                 <h2 class="fw-bold mb-1">{{ $totalEmployees }}</h2>
@@ -44,8 +44,8 @@
             <div class="card bg-white text-dark border-0 shadow-sm rounded-4 p-4">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <h6 class="text-muted mb-0">Active Employees</h6>
-                    <div class="rounded-circle bg-success bg-opacity-10 p-2">
-                        <i class="bi bi-person-check fs-5 text-success"></i>
+                    <div class="rounded-circle bg-secondary bg-opacity-10 p-2">
+                        <i class="bi bi-person-check fs-5 "></i>
                     </div>
                 </div>
                 <h2 class="fw-bold mb-1">{{ $activeEmployees }}</h2>
@@ -57,8 +57,8 @@
             <div class="card bg-white text-dark border-0 shadow-sm rounded-4 p-4">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <h6 class="text-muted mb-0">On Leave</h6>
-                    <div class="rounded-circle bg-purple bg-opacity-10 p-2">
-                        <i class="bi bi-calendar-x fs-5 text-purple"></i>
+                    <div class="rounded-circle bg-secondary bg-opacity-10 p-2">
+                        <i class="bi bi-calendar-x fs-5 "></i>
                     </div>
                 </div>
                 <h2 class="fw-bold mb-1">{{ $onLeave }}</h2>
@@ -70,8 +70,8 @@
             <div class="card bg-white text-dark border-0 shadow-sm rounded-4 p-4">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <h6 class="text-muted mb-0">Pending Payrolls</h6>
-                    <div class="rounded-circle bg-warning bg-opacity-10 p-2">
-                        <i class="bi bi-graph-up-arrow fs-5 text-warning"></i>
+                    <div class="rounded-circle bg-secondary bg-opacity-10 p-2">
+                        <i class="bi bi-graph-up-arrow fs-5 "></i>
                     </div>
                 </div>
                 <h2 class="fw-bold mb-1">{{ $pendingPayrolls}}</h2>

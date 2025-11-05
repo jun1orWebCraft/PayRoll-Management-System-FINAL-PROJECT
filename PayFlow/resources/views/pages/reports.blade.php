@@ -9,7 +9,7 @@
     <div class="mb-4 border-bottom pb-3">
         <div class="d-flex align-items-center justify-content-between flex-wrap">
             <div>
-                <h4 class="fw-bold mb-1">Good Day, <span class="text-primary">{{ Auth::user()->name ?? 'HR' }}</span></h4>
+                <h4 class="fw-bold mb-1">Good Day, <span class="">{{ Auth::user()->name ?? 'HR' }}</span></h4>
                 <p class="text-muted mb-0">
                     We’re glad to see you again — here’s this month’s reports from <strong>PayFlow</strong>.
                 </p>
@@ -29,8 +29,8 @@
     <div class="card bg-white text-dark border-0 shadow-sm rounded-4 p-4">
         <div class="d-flex justify-content-between align-items-center mb-2">
             <h6 class="text-muted mb-0">Average Salary</h6>
-            <div class="rounded-circle bg-primary bg-opacity-10 p-2">
-                <i class="bi bi-cash-coin fs-5 text-primary"></i>
+            <div class="rounded-circle  bg-opacity-10 p-2">
+                <i class="bi bi-cash-coin fs-5 "></i>
             </div>
         </div>
         <h2 class="fw-bold mb-1">₱{{ number_format($averageSalary, 2) }}</h2>
@@ -41,8 +41,8 @@
     <div class="card bg-white text-dark border-0 shadow-sm rounded-4 p-4">
         <div class="d-flex justify-content-between align-items-center mb-2">
             <h6 class="text-muted mb-0">Total Payroll Cost</h6>
-            <div class="rounded-circle bg-success bg-opacity-10 p-2">
-                <i class="bi bi-wallet2 fs-5 text-success"></i>
+            <div class="rounded-circle  bg-opacity-10 p-2">
+                <i class="bi bi-wallet2 fs-5 "></i>
             </div>
         </div>
         <h2 class="fw-bold mb-1">₱{{ number_format($totalPayrollCost, 2) }}</h2>
@@ -53,8 +53,8 @@
             <div class="card bg-white text-dark border-0 shadow-sm rounded-4 p-4">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <h6 class="text-muted mb-0">Total Deduction</h6>
-                    <div class="rounded-circle bg-purple bg-opacity-10 p-2">
-                        <i class="bi bi-dash-circle fs-5 text-purple"></i>
+                    <div class="rounded-circle  bg-opacity-10 p-2">
+                        <i class="bi bi-dash-circle fs-5 "></i>
                     </div>
                 </div>
                 <h2 class="fw-bold mb-1">₱{{ number_format($totalDeduction, 2) }}</h2>
@@ -66,8 +66,8 @@
             <div class="card bg-white text-dark border-0 shadow-sm rounded-4 p-4">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <h6 class="text-muted mb-0">Average Attendance Rate</h6>
-                    <div class="rounded-circle bg-warning bg-opacity-10 p-2">
-                        <i class="bi bi-graph-up-arrow fs-5 text-warning"></i>
+                    <div class="rounded-circle  bg-opacity-10 p-2">
+                        <i class="bi bi-graph-up-arrow fs-5 "></i>
                     </div>
                 </div>
                 <h2 class="fw-bold mb-1">{{ $averageAttendanceRate }}%</h2>
@@ -83,7 +83,7 @@
         <div class="col-md-6">
             <div class="card bg-white text-dark border-0 shadow-sm rounded-4 p-4 h-110 fixed-card">
                 <h5 class="fw-bold mb-3">
-                    <i class="bi bi-bar-chart-line me-2 text-primary"></i> Weekly Attendance Report
+                    <i class="bi bi-bar-chart-line me-2 "></i> Weekly Attendance Report
                 </h5>
                 <div class="scrollable-content d-flex justify-content-center align-items-center">
                     <canvas id="weeklyAttendanceChart" style="max-width: 400px; max-height: 250px;"></canvas>
@@ -96,7 +96,7 @@
         <div class="col-md-6">
             <div class="card bg-white text-dark border-0 shadow-sm rounded-4 p-4 h-100 fixed-card">
                 <h5 class="fw-bold mb-3">
-                    <i class="bi bi-pie-chart me-2 text-success"></i> Employees by Position
+                    <i class="bi bi-pie-chart me-2 "></i> Employees by Position
                 </h5>
                 <div class="scrollable-content d-flex justify-content-center align-items-center">
                     <canvas id="employeePositionChart" style="max-width: 300px; max-height: 300px;"></canvas>
