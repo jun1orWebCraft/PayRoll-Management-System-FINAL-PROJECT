@@ -45,6 +45,7 @@ class Employee extends Authenticatable
 
     protected $casts = [
         'hire_date' => 'date',
+        'birthday' => 'date',
     ];
 
     // ------------------------

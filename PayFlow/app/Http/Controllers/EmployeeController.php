@@ -194,9 +194,43 @@ class EmployeeController extends Controller
 
     public function profile()
     {
-        $employee = auth()->user();
+        $employee = auth()->guard('employee')->user(); 
+        $employee->load('position'); 
         return view('employeepages.profile', compact('employee'));
     }
+    public function updateProfile(Request $request)
+{
+    $employee = auth()->guard('employee')->user();
+
+    $request->validate([
+        'first_name' => 'required|string|max:255',
+        'last_name' => 'required|string|max:255',
+        'phone' => 'nullable|string|max:20',
+        'address' => 'nullable|string|max:255',
+        'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+    ]);
+
+    // Update profile picture if uploaded
+    if ($request->hasFile('profile_picture')) {
+        // Delete old picture if exists
+        if ($employee->profile_picture && Storage::disk('public')->exists($employee->profile_picture)) {
+            Storage::disk('public')->delete($employee->profile_picture);
+        }
+
+        $path = $request->file('profile_picture')->store('profile_pictures', 'public');
+        $employee->profile_picture = $path;
+    }
+
+    // Update other fields
+    $employee->first_name = $request->first_name;
+    $employee->last_name = $request->last_name;
+    $employee->phone = $request->phone;
+    $employee->address = $request->address;
+
+    $employee->save();
+
+    return redirect()->back()->with('success', 'Profile updated successfully.');
+}
 
     public function settings()
     {

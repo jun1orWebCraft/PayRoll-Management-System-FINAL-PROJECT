@@ -80,7 +80,7 @@ Route::middleware('web')->group(function () {
       
             Route::get('/profile', [EmployeeController::class, 'profile'])
                 ->name('employee.profile');
-            
+             Route::post('/profile/update', [EmployeeController::class, 'updateProfile'])->name('employee.profile.update');
             Route::get('/request', [EmployeeController::class, 'request'])
             ->name('employee.request');
        
