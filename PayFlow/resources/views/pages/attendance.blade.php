@@ -16,19 +16,23 @@
     <form method="GET" action="{{ route('attendance.index') }}">
         <div class="row g-3 mb-4">
             <div class="col-md-6">
-                <input type="text" name="search" class="form-control shadow-sm" placeholder="Search employees..." value="{{ request('search') }}">
+                <input type="text" name="search" class="form-control shadow-sm" 
+                    placeholder="Search employees..." value="{{ request('search') }}">
             </div>
             <div class="col-md-3">
-                <select name="status" class="form-select shadow-sm">
+                <select name="name" class="form-select shadow-sm">
                     <option value="">All Status</option>
+                    <option value="Present" {{ request('name') == 'Present' ? 'selected' : '' }}>Present</option>
+                    <option value="Absent" {{ request('name') == 'Absent' ? 'selected' : '' }}>Absent</option>
+                    <option value="On Leave" {{ request('name') == 'On Leave' ? 'selected' : '' }}>On Leave</option>
                 </select>
             </div>
             <div class="col-md-3">
-                <select name="employment_type" class="form-select shadow-sm">
-                </select>
+                <input type="date" name="date" class="form-control shadow-sm" value="{{ request('date') }}">
             </div>
         </div>
     </form>
+
 
     {{-- Attendance Table --}}
     <div class="table-responsive bg-white rounded-4 p-3 shadow-sm border">
