@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Mail;
 use Endroid\QrCode\Writer\PngWriter;
 use App\Mail\EmployeeWelcomeMail;
 use App\Models\ActivityLog;
-
+use App\Models\Position;
 
 
 class EmployeeController extends Controller
@@ -23,7 +23,7 @@ class EmployeeController extends Controller
   public function index(Request $request)
     {
         $query = Employee::with('position');
-
+         $positions = Position::all();
         // Search by name or email
         if ($request->filled('search')) {
             $search = $request->search;
@@ -46,7 +46,7 @@ class EmployeeController extends Controller
 
         $employees = $query->paginate(10); // paginate if many employees
 
-        return view('pages.employees', compact('employees'));
+        return view('pages.employees', compact('employees', 'positions'));
     }
 
 
@@ -55,7 +55,8 @@ class EmployeeController extends Controller
      */
     public function create()
     {
-        return view('pages.employees');
+        $positions = Position::all();
+        return view('pages.employees', compact('positions'));
     }
 
     /**
@@ -158,7 +159,8 @@ class EmployeeController extends Controller
     public function edit(Employee $employee)
     {
         
-        return view('pages.employees', compact('employee'));
+        $positions = Position::all();
+        return view('pages.employees', compact('employee', 'positions'));
     }
 
     /**

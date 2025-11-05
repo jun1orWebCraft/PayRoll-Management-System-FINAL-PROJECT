@@ -241,8 +241,16 @@
                                             </select>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label">Position ID</label>
-                                            <input type="number" name="position_id" class="form-control" value="{{ $employee->position_id }}" required>
+                                            <label class="form-label">Position</label>
+                                            <select name="position_id" class="form-select" required>
+                                                <option value="" disabled>Select Position</option>
+                                                @foreach($positions as $position)
+                                                    <option value="{{ $position->position_id }}"
+                                                        {{ isset($employee) && $employee->position_id == $position->position_id ? 'selected' : '' }}>
+                                                        {{ $position->position_name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
@@ -329,8 +337,16 @@
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Position ID</label>
-                                <input type="number" name="position_id" class="form-control" required>
+                                <label class="form-label">Position</label>
+                                <select name="position_id" class="form-select" required>
+                                    <option value="" disabled selected>Select Position</option>
+                                    @foreach($positions as $position)
+                                        <option value="{{ $position->position_id }}"
+                                            {{ isset($employee) && $employee->position_id == $position->position_id ? 'selected' : '' }}>
+                                            {{ $position->position_name }}
+                                        </option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
                     </div>

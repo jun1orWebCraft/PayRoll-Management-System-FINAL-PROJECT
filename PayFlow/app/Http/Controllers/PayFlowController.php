@@ -12,7 +12,6 @@ use App\Models\Payroll;
 use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Hash;
 
-
 class PayFlowController extends Controller
 {
 public function dashboard()   
@@ -44,7 +43,8 @@ public function dashboard()
 
     public function employees()  
     {
-        return view('pages.employees');
+        $positions = Position::all(); 
+        return view('pages.employees', compact('positions'));
     }
 
     public function attendance(){
