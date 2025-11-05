@@ -47,7 +47,7 @@ Route::middleware('web')->group(function () {
         Route::get('/', [PayFlowController::class, 'dashboard'])->name('dashboard');
         Route::get('/employees', [PayFlowController::class, 'employees'])->name('employees');
         Route::get('/attendance', [PayFlowController::class, 'attendance'])->name('attendance');
-        Route::get('/taxanddeductions', [PayFlowController::class, 'taxanddeductions'])->name('taxanddeductions');
+        Route::get('/payrolldata', [PayFlowController::class, 'payrolldata'])->name('payrolldata');
         Route::get('/reports', [PayFlowController::class, 'reports'])->name('reports');
         Route::get('/settings', [PayFlowController::class, 'settings'])->name('settings');
         

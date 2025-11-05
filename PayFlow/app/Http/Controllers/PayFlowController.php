@@ -51,9 +51,9 @@ public function dashboard()
         return view('pages.attendance');
     }
 
-    public function taxanddeductions()
+    public function payrolldata()
     {
-        return view('pages.taxanddeductions');
+        return view('pages.payrolldata');
     }                                                                                                                               
 
     public function payrollprocessing()

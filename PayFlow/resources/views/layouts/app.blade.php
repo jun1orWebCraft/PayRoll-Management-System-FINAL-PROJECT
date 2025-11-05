@@ -151,7 +151,7 @@ main {
         <a href="{{ route('attendance.index') }}" class="nav-link {{ request()->routeIs('attendance.*') ? 'active' : '' }}">
           <span class="icon"><i class="bi bi-clock-fill"></i></span><span>Attendance</span>
         </a>
-        <a href="{{ route('taxanddeductions') }}" class="nav-link {{ request()->routeIs('taxanddeductions') ? 'active' : '' }}">
+        <a href="{{ route('payrolldata') }}" class="nav-link {{ request()->routeIs('payrolldata') ? 'active' : '' }}">
           <span class="icon"><i class="bi bi-receipt"></i></span><span>Payroll</span>
         </a>
         <a href="{{ route('reports') }}" class="nav-link {{ request()->routeIs('reports') ? 'active' : '' }}">
