@@ -5,23 +5,18 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>@yield('title','employee.dashboard') — PayFlow</title>
 
-  {{-- ✅ Bootstrap CSS --}}
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-  {{-- ✅ Bootstrap Icons --}}
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-
-  {{-- ✅ Your custom app layout CSS --}}
   <link rel="stylesheet" href="{{ asset('css/applayout.css') }}">
 
   <style>
-/* 🌙 Improved Dark Mode Readability */
+
 body.dark-mode {
     background-color: #0f0f0f !important;
     color: #f1f1f1 !important;
 }
 
-/* Cards, forms, and modals */
+
 body.dark-mode .card,
 body.dark-mode .modal-content {
     background-color: #1a1a1a !important;
@@ -29,7 +24,6 @@ body.dark-mode .modal-content {
     border-color: #2c2c2c !important;
 }
 
-/* Labels, headings, and muted text */
 body.dark-mode label,
 body.dark-mode h1,
 body.dark-mode h2,
@@ -45,7 +39,7 @@ body.dark-mode small {
     color: #bbbbbb !important;
 }
 
-/* Input fields and dropdowns */
+
 body.dark-mode .form-control,
 body.dark-mode .form-select {
     background-color: #2a2a2a !important;
@@ -57,7 +51,6 @@ body.dark-mode .form-control::placeholder {
     color: #aaaaaa !important;
 }
 
-/* Buttons */
 body.dark-mode .btn-primary {
     background-color: #0d6efd !important;
     border-color: #0d6efd !important;
@@ -70,19 +63,19 @@ body.dark-mode .btn-success {
     color: #fff !important;
 }
 
-/* Switch toggles */
+
 body.dark-mode .form-check-input:checked {
     background-color: #0d6efd !important;
     border-color: #0d6efd !important;
 }
 
-/* Dropdowns and selects */
+
 body.dark-mode option {
     background-color: #1a1a1a;
     color: #f1f1f1;
 }
 
-/* Input focus state */
+
 body.dark-mode .form-control:focus {
     border-color: #0d6efd !important;
     box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
