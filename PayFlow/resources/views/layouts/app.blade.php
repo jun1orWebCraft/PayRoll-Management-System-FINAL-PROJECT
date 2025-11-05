@@ -163,7 +163,7 @@ main {
       </nav>
 
       <div class="sidebar-footer">
-        @if (Auth::check())
+        @if (Auth::check() )
         <div class="profile-container">
           <div class="profile" id="profileButton">
             <img src="{{ asset('images/profile.png') }}" alt="Profile photo">

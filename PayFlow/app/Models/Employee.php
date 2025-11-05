@@ -20,6 +20,8 @@ class Employee extends Authenticatable
         'first_name',
         'last_name',
         'email',
+        'birthday',
+        'age',
         'password',
         'phone',
         'address',
@@ -30,6 +32,11 @@ class Employee extends Authenticatable
         'position_id',
         'profile_picture',
     ];
+    public function getFullNameAttribute()
+    {   
+        return "{$this->first_name} {$this->last_name}";
+    }
+
 
     protected $hidden = [
         'password',

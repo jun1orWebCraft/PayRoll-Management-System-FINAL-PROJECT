@@ -74,7 +74,7 @@
                         <i class="bi bi-graph-up-arrow fs-5 text-warning"></i>
                     </div>
                 </div>
-                <h2 class="fw-bold mb-1">12</h2>
+                <h2 class="fw-bold mb-1">{{ $pendingPayrolls}}</h2>
             </div>
         </div>
     </div>
@@ -82,24 +82,30 @@
     <div class="row g-4 mt-3">
    
         <div class="col-md-6">
-            <div class="card bg-white text-dark border-0 shadow-sm rounded-4 p-4 h-110 fixed-card">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="fw-bold mb-0">Recent Activities</h5>
-                    <i class="bi bi-clock-history text-primary fs-5"></i>
-                </div>
-
-                <div class="scrollable-content">
-                    <ul class="list-unstyled mb-0">
-                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i> Payroll for October processed</li>
-                        <li class="mb-2"><i class="bi bi-person-plus text-info me-2"></i> New employee <strong>Maria Dela Cruz</strong> added</li>
-                        <li class="mb-2"><i class="bi bi-pencil-square text-warning me-2"></i> HR updated attendance records</li>
-                        <li><i class="bi bi-envelope-open text-secondary me-2"></i> Leave request reviewed</li>
-                        <li><i class="bi bi-clipboard-data text-primary me-2"></i> Department report submitted</li>
-                        <li><i class="bi bi-person-fill-down text-danger me-2"></i> Employee termination recorded</li>
-                    </ul>
-                </div>
-            </div>
+    <div class="card bg-white text-dark border-0 shadow-sm rounded-4 p-4 h-110 fixed-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0">Recent Activities</h5>
+            <i class="bi bi-clock-history text-primary fs-5"></i>
         </div>
+
+        <div class="scrollable-content">
+            <ul class="list-unstyled mb-0">
+                @forelse($recentActivities as $activity)
+                    <li class="mb-2">
+                        <i class="bi {{ $activity->icon }} {{ $activity->color }} me-2"></i>
+                        {{ $activity->action }}
+                        <small class="text-muted float-end">
+                            {{ $activity->created_at->diffForHumans() }}
+                        </small>
+                    </li>
+                @empty
+                    <li class="text-muted">No recent activities yet.</li>
+                @endforelse
+            </ul>
+        </div>
+    </div>
+</div>
+
 
         {{-- Employee Leave Requests --}}
         <div class="col-md-6">

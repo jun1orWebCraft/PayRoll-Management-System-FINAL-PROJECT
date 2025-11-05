@@ -26,15 +26,15 @@ Route::middleware('web')->group(function () {
         ->name('logout');
 
     // 🔸 Forgot / Reset Password
-    Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
-        ->middleware('guest')
-        ->name('password.request');
-    Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
-        ->middleware('guest')
-        ->name('password.email');
+    Route::get('/forgot-password', [PasswordResetLinkController::class, 'create'])->name('password.request');
+    Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])->name('password.email');
+    Route::post('/verify-code', [PasswordResetLinkController::class, 'verifyCode'])->name('password.verify.code');
 
-    Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
-        ->name('password.reset');
+    // Laravel’s built-in reset route:
+    Route::get('/reset-password/{token}', function ($token) {
+        return view('auth.reset-password', ['token' => $token]);
+    })->name('password.reset');
+    
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->name('password.update');
 
@@ -85,8 +85,9 @@ Route::middleware('web')->group(function () {
        
             Route::get('/settings', [EmployeeController::class, 'settings'])
                 ->name('employee.settings');
-       
             
+            Route::resource('employee', EmployeeController::class);
+            Route::post('/profile/update', [EmployeeController::class, 'updateProfile'])->name('employee.updateProfile');
         });
     });
 

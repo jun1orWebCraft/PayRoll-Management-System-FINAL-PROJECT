@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('last_name', 100);
             $table->string('email', 150)->unique();
             $table->string('password');
+            $table->date('birthday')->default('2000-01-01');
+            $table->integer('age');
             $table->string('phone', 50)->nullable();
             $table->string('address', 255)->nullable();
             $table->date('hire_date')->nullable();

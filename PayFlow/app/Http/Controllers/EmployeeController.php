@@ -11,6 +11,8 @@ use Endroid\QrCode\Encoding\Encoding;
 use Illuminate\Support\Facades\Mail;
 use Endroid\QrCode\Writer\PngWriter;
 use App\Mail\EmployeeWelcomeMail;
+use App\Models\ActivityLog;
+
 
 
 class EmployeeController extends Controller
@@ -70,6 +72,8 @@ class EmployeeController extends Controller
         'email' => 'required|email|unique:employees,email',
         'phone' => 'nullable|string|max:20',
         'address' => 'nullable|string|max:255',
+        'birthday' => 'required|date',
+        'age' => 'required|integer',
         'hire_date' => 'required|date',
         'basic_salary' => 'required|numeric|min:0',
         'status' => 'required|in:Active,Inactive,On Leave',
@@ -107,6 +111,8 @@ class EmployeeController extends Controller
         'password' => Hash::make($randomPassword),
         'phone' => $request->phone,
         'address' => $request->address,
+        'birthday' => $request->birthday,
+        'age' => $request->age,
         'hire_date' => $request->hire_date,
         'basic_salary' => $request->basic_salary,
         'status' => $request->status,
@@ -122,6 +128,11 @@ class EmployeeController extends Controller
         // Optionally log or handle email sending failure
         \Log::error('Failed to send email: '.$e->getMessage());
     }
+     ActivityLog::create([
+        'action' => "New employee {$employee->first_name} {$employee->last_name} added",
+        'icon' => 'bi-person-plus',
+        'color' => 'text-info',
+    ]);
 
     return redirect()
         ->route('employees.index')
@@ -146,6 +157,7 @@ class EmployeeController extends Controller
      */
     public function edit(Employee $employee)
     {
+        
         return view('pages.employees', compact('employee'));
     }
 
@@ -161,6 +173,7 @@ class EmployeeController extends Controller
         'phone' => 'nullable|string|max:20',
         'address' => 'nullable|string|max:255',
         'basic_salary' => 'required|numeric|min:0',
+        'age' => 'required|integer',
         'status' => 'required|in:Active,Inactive,On Leave',
         'employment_type' => 'required|string|max:50',
         'position_id' => 'required|integer',
@@ -183,6 +196,7 @@ class EmployeeController extends Controller
         'email' => $request->email,
         'phone' => $request->phone,
         'address' => $request->address,
+        'age' => $request->age,
         'basic_salary' => $request->basic_salary,
         'status' => $request->status,
         'employment_type' => $request->employment_type,
@@ -217,7 +231,9 @@ class EmployeeController extends Controller
 
     public function profile()
     {
-        return view('employeepages.profile');
+        
+        $employee = auth()->user(); 
+        return view('employeepages.profile', compact('employee'));
     }
 
     public function settings()
@@ -229,5 +245,37 @@ class EmployeeController extends Controller
     {
         return view('employeepages.request');
     }
+    public function updateProfile(Request $request)
+{
+    $employee = auth()->guard('employee')->user();
+
+    $request->validate([
+        'first_name' => 'required|string|max:255',
+        'last_name' => 'required|string|max:255',
+        'address' => 'nullable|string|max:255',
+        'phone' => 'nullable|string|max:20',
+        'profile_picture' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+    ]);
+
+    // ✅ Handle profile picture upload
+    if ($request->hasFile('profile_picture')) {
+        if ($employee->profile_picture) {
+            \Storage::disk('public')->delete($employee->profile_picture);
+        }
+        $employee->profile_picture = $request->file('profile_picture')->store('profile_pictures', 'public');
+    }
+
+    // ✅ Update basic info
+    $employee->update([
+        'first_name' => $request->first_name,
+        'last_name' => $request->last_name,
+        'address' => $request->address,
+        'phone' => $request->phone,
+        'profile_picture' => $employee->profile_picture,
+    ]);
+
+    return redirect()->route('employee.profile')->with('success', 'Profile updated successfully.');
+}
+
   
 }

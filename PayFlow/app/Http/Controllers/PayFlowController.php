@@ -4,7 +4,12 @@ namespace App\Http\Controllers;
 use App\Models\Employee;
 use Illuminate\Http\Request;
 use App\Models\LeaveRequest;
-
+use App\Models\Position;
+use Carbon\Carbon;
+use App\Models\Attendance;
+use App\Models\Deduction;
+use App\Models\Payroll;
+use App\Models\ActivityLog;
 class PayFlowController extends Controller
 {
 public function dashboard()   
@@ -21,10 +26,15 @@ public function dashboard()
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
+            $recentActivities = ActivityLog::orderBy('created_at', 'desc')
+            ->take(6) // limit to 6 entries
+            ->get();
+
         $activeEmployees = Employee::where('status', 'Active')->count();
         $onLeave = Employee::where('status', 'On Leave')->count();
         $totalEmployees = Employee::count();
-        return view('pages.dashboard', compact('totalEmployees', 'onLeave', 'activeEmployees', 'leaveRequests'));
+        $pendingPayrolls = Payroll::where('status', 'Pending')->count();
+        return view('pages.dashboard', compact('totalEmployees', 'onLeave', 'activeEmployees', 'leaveRequests', 'pendingPayrolls', 'recentActivities'));
     } 
 }
 
@@ -49,9 +59,66 @@ public function dashboard()
     }
 
     public function reports()
-    {
-        return view('pages.reports');
-    }     
+{
+    // ✅ Employees by Position (Pie Chart)
+    $positions = Position::withCount('employees')->get();
+    $labels = $positions->pluck('position_name');
+    $data = $positions->pluck('employees_count');
+
+    // ✅ Weekly Attendance Report (Bar Chart)
+    $startOfWeek = Carbon::now()->startOfWeek();
+    $endOfWeek = Carbon::now()->endOfWeek();
+
+    // Default days (Mon–Sun)
+    $weekDays = collect();
+    for ($i = 0; $i < 7; $i++) {
+        $day = $startOfWeek->copy()->addDays($i);
+        $weekDays[$day->format('D')] = 0;
+    }
+
+    $attendanceData = Attendance::selectRaw('DATE(date) as day, COUNT(*) as total')
+        ->whereBetween('date', [$startOfWeek, $endOfWeek])
+        ->where('status', 'Present')
+        ->groupBy('day')
+        ->orderBy('day', 'asc')
+        ->get();
+
+    foreach ($attendanceData as $record) {
+        $dayAbbrev = Carbon::parse($record->day)->format('D');
+        $weekDays[$dayAbbrev] = $record->total;
+    }
+
+    $attendanceLabels = $weekDays->keys();
+    $attendanceCounts = $weekDays->values();
+
+    // ✅ Compute Average Attendance Rate
+    $totalEmployees = \App\Models\Employee::count(); // total employees
+    $totalAttendance = Attendance::whereBetween('date', [$startOfWeek, $endOfWeek])
+        ->where('status', 'Present')
+        ->count();
+
+    // Each employee is expected to attend 7 days (Mon–Sun)
+    $expectedAttendance = $totalEmployees * 7;
+
+    $averageAttendanceRate = $expectedAttendance > 0
+        ? round(($totalAttendance / $expectedAttendance) * 100, 2)
+        : 0;
+    $averageSalary = Payroll::avg('basic_salary') ?? 0;
+    $totalPayrollCost = Payroll::sum('net_pay') ?? 0;
+    $totalDeduction = Deduction::sum('amount') ?? 0;
+    // Pass all data to view
+    return view('pages.reports', compact(
+        'labels',
+        'data',
+        'attendanceLabels',
+        'attendanceCounts',
+        'averageAttendanceRate',
+        'totalDeduction',
+        'totalPayrollCost',
+        'averageSalary'
+    ));
+}
+
     public function settings()
     {
         return view('pages.settings');

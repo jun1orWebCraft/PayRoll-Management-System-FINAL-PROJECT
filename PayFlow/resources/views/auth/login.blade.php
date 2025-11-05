@@ -153,7 +153,7 @@
                 </div>
 
                 <div class="mb-3 form-check text-start">
-                    <input type="checkbox" name="remember" id="remember" class="form-check-input">
+                    <input type="checkbox" name="rememberToken" id="remember" class="form-check-input">
                     <label class="form-check-label" for="remember">Remember me</label>
                 </div>
 

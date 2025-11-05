@@ -128,6 +128,14 @@
                                         <p class="text-dark">{{ $employee->address ?? 'N/A' }}</p>
                                     </div>
                                     <div class="col-md-6">
+                                        <label class="form-label fw-semibold text-muted">Bithday</label>
+                                        <p class="text-dark">{{ $employee->birthday }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold text-muted">Age</label>
+                                        <p class="text-dark">{{ $employee->age }}</p>
+                                    </div>
+                                    <div class="col-md-6">
                                         <label class="form-label fw-semibold text-muted">Hire Date</label>
                                         <p class="text-dark">{{ $employee->hire_date }}</p>
                                     </div>
@@ -210,6 +218,10 @@
                                             <input type="text" name="address" class="form-control" value="{{ $employee->address }}">
                                         </div>
                                         <div class="col-md-6">
+                                            <label class="form-label">Age</label>
+                                            <input type="number"  name="age" class="form-control" value="{{ $employee->age }}" required>
+                                        </div>
+                                        <div class="col-md-6">
                                             <label class="form-label">Basic Salary</label>
                                             <input type="number" step="0.01" name="basic_salary" class="form-control" value="{{ $employee->basic_salary }}" required>
                                         </div>
@@ -283,6 +295,14 @@
                             <div class="col-md-12">
                                 <label class="form-label">Address</label>
                                 <input type="text" name="address" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Birthday</label>
+                                <input type="date" name="birthday" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Age</label>
+                                <input type="number" name="age" class="form-control" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Hire Date</label>

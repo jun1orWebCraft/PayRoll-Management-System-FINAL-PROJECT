@@ -4,21 +4,23 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Password;
-use Illuminate\Auth\Events\PasswordReset;
-use Illuminate\Support\Str;
+use App\Models\User;
+use App\Models\Employee;
 
 class NewPasswordController extends Controller
 {
+    // Show reset password form
     public function create($token, Request $request)
     {
         return view('auth.reset-password', [
             'token' => $token,
-            'email' => $request->email
+            'email' => $request->email,
         ]);
     }
 
+    // Handle reset password
     public function store(Request $request)
     {
         $request->validate([
@@ -27,16 +29,33 @@ class NewPasswordController extends Controller
             'password' => 'required|confirmed|min:8',
         ]);
 
-        $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
-            function ($user, $password) {
-                $user->password = Hash::make($password);
-                $user->save();
-            }
-        );
+        // Find the password reset record
+        $record = DB::table('password_resets')
+            ->where('email', $request->email)
+            ->where('token', $request->token)
+            ->first();
 
-        return $status == Password::PASSWORD_RESET
-            ? redirect()->route('login')->with('status', __($status))
-            : back()->withErrors(['email' => [__($status)]]);
+        if (! $record) {
+            return back()->withErrors(['email' => 'Invalid token or email.']);
+        }
+
+        // Find user or employee
+        $account = User::where('email', $request->email)->first();
+        if (! $account) {
+            $account = Employee::where('email', $request->email)->first();
+        }
+
+        if (! $account) {
+            return back()->withErrors(['email' => 'Account not found.']);
+        }
+
+        // Update password
+        $account->password = Hash::make($request->password);
+        $account->save();
+
+        // Delete the password reset record
+        DB::table('password_resets')->where('email', $request->email)->delete();
+
+        return redirect()->route('login')->with('status', 'Password reset successfully.');
     }
 }

@@ -5,50 +5,76 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\VerificationCodeMail;
+use App\Models\User;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
-use App\Models\User;
 
 class PasswordResetLinkController extends Controller
 {
     public function create()
     {
-        return view('auth.forgot-password'); 
+        return view('auth.forgot-password');
     }
 
+    // Step 1: Send verification code via email
     public function store(Request $request)
     {
-        $request->validate([
-            'email' => ['required', 'email'],
-        ]);
+        $request->validate(['email' => ['required', 'email']]);
 
-        // Find user by email
         $user = User::where('email', $request->email)->first();
-
-        if (!$user) {
+        if (! $user) {
             return back()->withErrors(['email' => 'No user found with that email address.']);
         }
 
-        // Generate token manually
-        $token = Str::random(64);
+        // Generate 6-digit code
+        $code = rand(100000, 999999);
 
-        // Save token to password_resets table (create if missing)
+        // Save code (hashed) in password_resets table
         DB::table('password_resets')->updateOrInsert(
             ['email' => $request->email],
             [
                 'email' => $request->email,
-                'token' => Hash::make($token),
+                'token' => Hash::make($code),
                 'created_at' => now(),
             ]
         );
 
-        // Create reset link
-        $link = url(route('password.reset', [
-            'token' => $token,
-            'email' => $request->email,
-        ], false));
+        // Send code to email
+        Mail::to($request->email)->send(new VerificationCodeMail($code));
 
-        // Return link to the user
-        return back()->with('status', "Here is your password reset link: <br><a href='{$link}'>{$link}</a>");
+        // Show verification form
+        return view('auth.verify-code', ['email' => $request->email])
+            ->with('status', 'A verification code has been sent to your email.');
+    }
+
+    // Step 2: Verify code and redirect to reset page
+    public function verifyCode(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'code'  => 'required|digits:6',
+        ]);
+
+        $record = DB::table('password_resets')->where('email', $request->email)->first();
+
+        if (! $record || ! Hash::check($request->code, $record->token)) {
+            return back()->withErrors(['code' => 'Invalid verification code.'])->withInput();
+        }
+
+        // Generate one-time reset token
+        $resetToken = Str::random(64);
+
+        DB::table('password_resets')->where('email', $request->email)->update([
+            'token' => $resetToken,
+            'created_at' => now(),
+        ]);
+
+        // Redirect with token + email
+        return redirect()->route('password.reset', [
+            'token' => $resetToken,
+            'email' => $request->email,
+        ]);
     }
 }
