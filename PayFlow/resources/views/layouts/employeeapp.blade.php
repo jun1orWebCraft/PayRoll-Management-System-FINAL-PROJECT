@@ -149,10 +149,10 @@ main {
           <span class="icon"><i class="bi bi-people-fill"></i></span><span>Profile</span>
         </a>
         <a href="{{ route('employee.request') }}" class="nav-link {{ request()->routeIs('employee.request') ? 'active' : '' }}">
-          <span class="icon"><i class="bi bi bi-receipt"></i></span><span>Request</span>
+          <span class="icon"><i class="bi bi bi-receipt"></i></span><span>Leave Request</span>
         </a>
         <a href="{{ route('employee.settings') }}" class="nav-link {{ request()->routeIs('employee.settings') ? 'active' : '' }}">
-          <span class="icon"><i class="bi bi-gear-fill"></i></span><span>settings</span>
+          <span class="icon"><i class="bi bi-gear-fill"></i></span><span>Settings</span>
         </a>
         
       </nav>
