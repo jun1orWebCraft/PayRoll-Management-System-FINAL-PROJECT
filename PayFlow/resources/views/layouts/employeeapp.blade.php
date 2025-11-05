@@ -81,13 +81,13 @@ body.dark-mode .form-control:focus {
     box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
 }
 
-/* Card header or title contrast */
+
 body.dark-mode .card h5,
 body.dark-mode .card-title {
     color: #ffffff !important;
 }
 
-/* ✅ FIX: Prevent Sidebar from Scrolling */
+
 .layout {
     display: flex;
     height: 100vh;
