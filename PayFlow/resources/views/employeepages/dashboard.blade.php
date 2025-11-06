@@ -159,19 +159,19 @@
                 <h5 class="fw-bold mb-3">Attendance Summary - This Month</h5>
                 <div class="row text-center">
                     <div class="col-md-3">
-                        <h4 class="fw-bold text-primary">20</h4>
+                        <h4 class="fw-bold text-primary">{{ $presentDays }}</h4>
                         <p class="text-muted small mb-0">Days Present</p>
                     </div>
                     <div class="col-md-3">
-                        <h4 class="fw-bold text-danger">2</h4>
+                        <h4 class="fw-bold text-danger">{{ $absentDays }}</h4>
                         <p class="text-muted small mb-0">Days Absent</p>
                     </div>
                     <div class="col-md-3">
-                        <h4 class="fw-bold text-success">160</h4>
+                        <h4 class="fw-bold text-success">{{ round($totalHoursWorked) }}</h4>
                         <p class="text-muted small mb-0">Hours Worked</p>
                     </div>
                     <div class="col-md-3">
-                        <h4 class="fw-bold text-info">8</h4>
+                        <h4 class="fw-bold text-info">{{ round($overtimeHours) }}</h4>
                         <p class="text-muted small mb-0">Overtime Hours</p>
                     </div>
                 </div>

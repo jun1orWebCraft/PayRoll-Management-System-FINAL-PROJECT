@@ -237,8 +237,9 @@ class EmployeeController extends Controller
         $notifications = Notification::where('employee_id', $employee->employee_id)
                             ->orderBy('created_at', 'desc')
                             ->get();
-        $today = \Carbon\Carbon::today();
 
+
+        $today = \Carbon\Carbon::today();
         $startOfMonth = $today->copy()->startOfMonth();
         $endOfMonth = $today->copy()->endOfMonth();
 
@@ -247,18 +248,50 @@ class EmployeeController extends Controller
                         ->get();
 
         $totalDays = $attendances->count();
-        $presentDays = $attendances->whereIn('status', ['Present', 'On Leave'])->count();
+        $presentDays = $attendances->where('status', 'Present')->count(); 
+        $absentDays = $attendances->where('status', 'Absent')->count();
+        $onLeaveDays = $attendances->where('status', 'On Leave')->count(); 
+
+        $totalHoursWorked = 0;
+        $overtimeHours = 0;
+
+        foreach ($attendances as $attendance) {
+            if ($attendance->time_in && $attendance->time_out && $attendance->status === 'Present') { 
+                $end = \Carbon\Carbon::parse($attendance->time_out);
+
+                $hoursWorked = $end->diffInMinutes($start) / 60; 
+                $totalHoursWorked += $hoursWorked;
+
+                if ($hoursWorked > 8) {
+                    $overtimeHours += $hoursWorked - 8;
+                }
+            }
+        }
 
         $attendanceRate = $totalDays > 0 ? round(($presentDays / $totalDays) * 100) : 0;
+
+
         $latestLeaveRequest = LeaveRequest::where('employee_id', $employee->employee_id)
-                        ->orderBy('created_at', 'desc')
-                        ->first();
+                            ->orderBy('created_at', 'desc')
+                            ->first();
 
         $latestLeaveType = $latestLeaveRequest ? $latestLeaveRequest->leave_type : 'Annual Leave';
         $latestLeaveRemaining = $leaveProgress[$latestLeaveType]['remaining'] ?? 0;
 
-        return view('employeepages.dashboard', compact('leaveRequests', 'leaveProgress', 'notifications', 'attendanceRate', 'latestLeaveType', 'latestLeaveRemaining'));
+        return view('employeepages.dashboard', compact(
+            'leaveRequests',
+            'leaveProgress',
+            'notifications',
+            'attendanceRate',
+            'latestLeaveType',
+            'latestLeaveRemaining',
+            'presentDays',
+            'absentDays',
+            'totalHoursWorked',
+            'overtimeHours'
+        ));
     }
+
 
     public function markAllRead()
     {
