@@ -11,6 +11,15 @@ class LeaveRequest extends Model
 
     protected $primaryKey = 'leave_request_id'; // matches migration
 
+    const LEAVE_TYPES = [
+        'Annual Leave',
+        'Vacation Leave',
+        'Sick Leave',
+        'Emergency Leave',
+        'Maternity Leave',
+        'Paternity Leave',
+    ];
+
     protected $fillable = [
         'employee_id',
         'leave_type',
@@ -30,6 +39,6 @@ class LeaveRequest extends Model
     // Relationship: LeaveRequest belongs to the Employee/HR who approved
     public function approver()
     {
-        return $this->belongsTo(Employee::class, 'approved_by', 'employee_id');
+        return $this->belongsTo(User::class, 'approved_by');
     }
 }

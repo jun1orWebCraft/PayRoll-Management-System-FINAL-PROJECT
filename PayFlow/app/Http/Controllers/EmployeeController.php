@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Employee;
+use App\Models\Attendance;
 use App\Models\ActivityLog;
 use App\Models\Position;
 use Illuminate\Http\Request;
@@ -13,6 +14,9 @@ use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\Writer\PngWriter;
 use App\Mail\EmployeeWelcomeMail;
+use App\Models\LeaveRequest;
+use App\Models\Notification;
+use Illuminate\Support\Facades\Auth;
 
 class EmployeeController extends Controller
 {
@@ -39,7 +43,6 @@ class EmployeeController extends Controller
         }
 
         $employees = $query->paginate(10);
-
         return view('pages.employees', compact('employees', 'positions'));
     }
 
@@ -69,7 +72,6 @@ class EmployeeController extends Controller
 
         $employee_no = Employee::generateEmployeeNo();
         $randomPassword = substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()'), 0, 8);
-
         $profilePicturePath = $request->hasFile('profile_picture') 
             ? $request->file('profile_picture')->store('profile_pictures', 'public') 
             : null;
@@ -189,7 +191,82 @@ class EmployeeController extends Controller
 
     public function dashboard()
     {
-        return view('employeepages.dashboard');
+        $employee = Auth::user(); 
+
+        $baseBalances = [
+            'Annual Leave'    => 10,
+            'Vacation Leave'  => 5,
+            'Sick Leave'      => 10,
+            'Emergency Leave' => 3,
+            'Maternity Leave' => 105,
+            'Paternity Leave' => 7,
+        ];
+
+        $usedLeaves = array_fill_keys(array_keys($baseBalances), 0);
+
+        $approvedLeaves = LeaveRequest::where('employee_id', $employee->employee_id)
+                            ->where('status', 'Approved')
+                            ->get();
+
+        foreach ($approvedLeaves as $leave) {
+            if (isset($usedLeaves[$leave->leave_type])) {
+                $start = \Carbon\Carbon::parse($leave->start_date);
+                $end = \Carbon\Carbon::parse($leave->end_date);
+                $daysTaken = $start->diffInDays($end) + 1;
+                $usedLeaves[$leave->leave_type] += $daysTaken;
+            }
+        }
+
+        $leaveProgress = [];
+        foreach ($baseBalances as $type => $total) {
+            $used = $usedLeaves[$type];
+            $remaining = max($total - $used, 0);
+            $percentage = $total > 0 ? ($used / $total) * 100 : 0;
+            $leaveProgress[$type] = [
+                'used' => $used,
+                'remaining' => $remaining,
+                'total' => $total,
+                'percentage' => $percentage,
+            ];
+        }
+
+        $leaveRequests = LeaveRequest::where('employee_id', $employee->employee_id)
+                            ->orderBy('start_date', 'desc')
+                            ->get();
+
+        $notifications = Notification::where('employee_id', $employee->employee_id)
+                            ->orderBy('created_at', 'desc')
+                            ->get();
+        $today = \Carbon\Carbon::today();
+
+        $startOfMonth = $today->copy()->startOfMonth();
+        $endOfMonth = $today->copy()->endOfMonth();
+
+        $attendances = Attendance::where('employee_id', $employee->employee_id)
+                        ->whereBetween('date', [$startOfMonth, $endOfMonth])
+                        ->get();
+
+        $totalDays = $attendances->count();
+        $presentDays = $attendances->whereIn('status', ['Present', 'On Leave'])->count();
+
+        $attendanceRate = $totalDays > 0 ? round(($presentDays / $totalDays) * 100) : 0;
+        $latestLeaveRequest = LeaveRequest::where('employee_id', $employee->employee_id)
+                        ->orderBy('created_at', 'desc')
+                        ->first();
+
+        $latestLeaveType = $latestLeaveRequest ? $latestLeaveRequest->leave_type : 'Annual Leave';
+        $latestLeaveRemaining = $leaveProgress[$latestLeaveType]['remaining'] ?? 0;
+
+        return view('employeepages.dashboard', compact('leaveRequests', 'leaveProgress', 'notifications', 'attendanceRate', 'latestLeaveType', 'latestLeaveRemaining'));
+    }
+
+    public function markAllRead()
+    {
+        $employee = Auth::user();
+        Notification::where('employee_id', $employee->employee_id)
+            ->where('is_read', 0)
+            ->update(['is_read' => 1]);
+        return back();
     }
 
     public function profile()
@@ -198,39 +275,36 @@ class EmployeeController extends Controller
         $employee->load('position'); 
         return view('employeepages.profile', compact('employee'));
     }
+
     public function updateProfile(Request $request)
-{
-    $employee = auth()->guard('employee')->user();
+    {
+        $employee = auth()->guard('employee')->user();
 
-    $request->validate([
-        'first_name' => 'required|string|max:255',
-        'last_name' => 'required|string|max:255',
-        'phone' => 'nullable|string|max:20',
-        'address' => 'nullable|string|max:255',
-        'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-    ]);
+        $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'phone' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:255',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
 
-    // Update profile picture if uploaded
-    if ($request->hasFile('profile_picture')) {
-        // Delete old picture if exists
-        if ($employee->profile_picture && Storage::disk('public')->exists($employee->profile_picture)) {
-            Storage::disk('public')->delete($employee->profile_picture);
+        if ($request->hasFile('profile_picture')) {
+            if ($employee->profile_picture && Storage::disk('public')->exists($employee->profile_picture)) {
+                Storage::disk('public')->delete($employee->profile_picture);
+            }
+            $path = $request->file('profile_picture')->store('profile_pictures', 'public');
+            $employee->profile_picture = $path;
         }
 
-        $path = $request->file('profile_picture')->store('profile_pictures', 'public');
-        $employee->profile_picture = $path;
+        $employee->first_name = $request->first_name;
+        $employee->last_name = $request->last_name;
+        $employee->phone = $request->phone;
+        $employee->address = $request->address;
+
+        $employee->save();
+
+        return redirect()->back()->with('success', 'Profile updated successfully.');
     }
-
-    // Update other fields
-    $employee->first_name = $request->first_name;
-    $employee->last_name = $request->last_name;
-    $employee->phone = $request->phone;
-    $employee->address = $request->address;
-
-    $employee->save();
-
-    return redirect()->back()->with('success', 'Profile updated successfully.');
-}
 
     public function settings()
     {
@@ -239,6 +313,38 @@ class EmployeeController extends Controller
 
     public function request()
     {
-        return view('employeepages.request');
+        $leaveTypes = LeaveRequest::LEAVE_TYPES;
+
+        $baseBalances = [
+            'Annual Leave'    => 10,
+            'Vacation Leave'  => 5,
+            'Sick Leave'      => 10,
+            'Emergency Leave' => 3,
+            'Maternity Leave' => 105,
+            'Paternity Leave' => 7,
+        ];
+
+        $employee = auth()->user(); 
+
+        $leaveBalances = [];
+        foreach ($leaveTypes as $type) {
+            $leaveBalances[$type] = $baseBalances[$type] ?? 0;
+        }
+
+        $approvedLeaves = LeaveRequest::where('employee_id', $employee->employee_id)
+                            ->where('status', 'Approved')
+                            ->whereYear('start_date', now()->year)
+                            ->get();
+
+        foreach ($approvedLeaves as $leave) {
+            if (isset($leaveBalances[$leave->leave_type])) {
+                $start = \Carbon\Carbon::parse($leave->start_date);
+                $end = \Carbon\Carbon::parse($leave->end_date);
+                $daysTaken = $start->diffInDays($end) + 1;
+                $leaveBalances[$leave->leave_type] = max(0, $leaveBalances[$leave->leave_type] - $daysTaken);
+            }
+        }
+
+        return view('employeepages.request', compact('leaveTypes', 'leaveBalances'));
     }
 }

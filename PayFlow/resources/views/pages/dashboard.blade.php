@@ -108,83 +108,86 @@
 
 
         {{-- Employee Leave Requests --}}
-        <div class="col-md-6">
-            <div class="card bg-white text-dark border-0 shadow-sm rounded-4 p-4 h-100 fixed-card">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="fw-bold mb-0">Employee Leave Requests</h5>
-                    <i class="bi bi-envelope-paper text-warning fs-5"></i>
-                </div>
+<div class="col-md-6">
+    <div class="card bg-white text-dark border-0 shadow-sm rounded-4 p-4 h-100 fixed-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0">Employee Leave Requests</h5>
+            <i class="bi bi-envelope-paper text-warning fs-5"></i>
+        </div>
 
-                <div class="scrollable-content">
-                    <table class="table table-borderless align-middle mb-0">
-                        <thead>
-                            <tr class="text-muted small">
-                                <th>Employee</th>
-                                <th>Date</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($leaveRequests as $leave)
-                                <tr data-bs-toggle="modal" data-bs-target="#leaveModal{{ $leave->leave_request_id }}" style="cursor:pointer;">
-                                    <td>{{ $leave->employee->first_name ?? 'Unknown' }} {{ $leave->employee->last_name ?? '' }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($leave->start_date)->format('M d, Y') }}</td>
-                                    <td>
-                                        @if ($leave->status === 'Pending')
-                                            <span class="badge bg-warning text-dark">Pending</span>
-                                        @elseif ($leave->status === 'Approved')
-                                            <span class="badge bg-success">Approved</span>
-                                        @else
-                                            <span class="badge bg-danger">Rejected</span>
-                                        @endif
-                                    </td>
-                                </tr>
+        <div class="scrollable-content">
+            <table class="table table-borderless align-middle mb-0">
+                <thead>
+                    <tr class="text-muted small">
+                        <th>Employee</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($leaveRequests as $leave)
+                        <tr data-bs-toggle="modal" data-bs-target="#leaveModal{{ $leave->leave_request_id }}" style="cursor:pointer;">
+                            <td>{{ $leave->employee->first_name ?? 'Unknown' }} {{ $leave->employee->last_name ?? '' }}</td>
+                            <td>{{ \Carbon\Carbon::parse($leave->start_date)->format('M d, Y') }}</td>
+                            <td>
+                                @if ($leave->status === 'Pending')
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                @elseif ($leave->status === 'Approved')
+                                    <span class="badge bg-success">Approved</span>
+                                @else
+                                    <span class="badge bg-danger">Rejected</span>
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="3" class="text-center text-muted">No leave requests found</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
-                                {{-- 🪟 Modal --}}
-                                <div class="modal fade" id="leaveModal{{ $leave->leave_request_id }}" tabindex="-1" aria-labelledby="leaveModalLabel{{ $leave->leave_request_id }}" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered">
-                                        <div class="modal-content">
-                                            <div class="modal-header bg-primary text-white">
-                                                <h5 class="modal-title" id="leaveModalLabel{{ $leave->leave_request_id }}">Leave Request Details</h5>
-                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <p><strong>Employee ID:</strong> {{ $leave->employee_id }}</p>
-                                                <p><strong>Employee Name:</strong> {{ $leave->employee->first_name ?? 'Unknown' }} {{ $leave->employee->last_name ?? '' }}</p>
-                                                <p><strong>Leave Type:</strong> {{ $leave->leave_type }}</p>
-                                                <p><strong>Reason:</strong> {{ $leave->reason ?? 'N/A' }}</p>
-                                                <p><strong>Start Date:</strong> {{ \Carbon\Carbon::parse($leave->start_date)->format('M d, Y') }}</p>
-                                                <p><strong>End Date:</strong> {{ \Carbon\Carbon::parse($leave->end_date)->format('M d, Y') }}</p>
-                                                <p><strong>Status:</strong> {{ $leave->status }}</p>
-                                            </div>
-                                            <div class="modal-footer">
-                                                @if ($leave->status === 'Pending')
-                                                    <form action="{{ route('leave.approve', $leave->leave_request_id) }}" method="POST" class="d-inline">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <button type="submit" class="btn btn-success">Approve</button>
-                                                    </form>
-                                                    <form action="{{ route('leave.reject', $leave->leave_request_id) }}" method="POST" class="d-inline">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <button type="submit" class="btn btn-danger">Reject</button>
-                                                    </form>
-                                                @endif
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            @empty
-                                <tr>
-                                    <td colspan="3" class="text-center text-muted">No leave requests found</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
+{{-- ✅ Move modals OUTSIDE the table --}}
+@foreach ($leaveRequests as $leave)
+<div class="modal fade" id="leaveModal{{ $leave->leave_request_id }}" tabindex="-1" aria-labelledby="leaveModalLabel{{ $leave->leave_request_id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="leaveModalLabel{{ $leave->leave_request_id }}">Leave Request Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Employee No:</strong> {{ $leave->employee->employee_no }}</p>
+                <p><strong>Employee Name:</strong> {{ $leave->employee->first_name ?? 'Unknown' }} {{ $leave->employee->last_name ?? '' }}</p>
+                <p><strong>Leave Type:</strong> {{ $leave->leave_type }}</p>
+                <p><strong>Reason:</strong> {{ $leave->reason ?? 'N/A' }}</p>
+                <p><strong>Start Date:</strong> {{ \Carbon\Carbon::parse($leave->start_date)->format('M d, Y') }}</p>
+                <p><strong>End Date:</strong> {{ \Carbon\Carbon::parse($leave->end_date)->format('M d, Y') }}</p>
+                <p><strong>Status:</strong> {{ $leave->status }}</p>
+            </div>
+            <div class="modal-footer">
+                @if ($leave->status === 'Pending')
+                    <form action="{{ route('leave.approve', $leave->leave_request_id) }}" method="POST" class="d-inline">
+                        @csrf
+                        @method('PUT')
+                        <button type="submit" class="btn btn-success">Approve</button>
+                    </form>
+                    <form action="{{ route('leave.reject', $leave->leave_request_id) }}" method="POST" class="d-inline">
+                        @csrf
+                        @method('PUT')
+                        <button type="submit" class="btn btn-danger">Reject</button>
+                    </form>
+                @endif
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
+    </div>
+</div>
+@endforeach
+
     </div>
 </div>
 

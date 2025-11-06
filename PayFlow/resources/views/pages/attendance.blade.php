@@ -60,15 +60,23 @@
                     <td>{{ $attendance->total_hours }}</td>
                     <td>
                         @php
-                            $status = $attendance->time_in ? ($attendance->time_out ? 'Present' : 'Late') : 'Absent';
+                            if ($attendance->status === 'On Leave') {
+                                $status = 'On Leave';
+                            } else {
+                                $status = $attendance->time_in ? ($attendance->time_out ? 'Present' : 'Late') : 'Absent';
+                            }
                         @endphp
+
                         @if ($status == 'Present')
                             <span class="badge bg-success">Present</span>
                         @elseif ($status == 'Late')
                             <span class="badge bg-warning text-dark">Late</span>
+                        @elseif ($status == 'On Leave')
+                            <span class="badge bg-warning text-dark">On Leave</span>
                         @else
                             <span class="badge bg-secondary">Absent</span>
                         @endif
+
                     </td>
                     <td>
                         <form action="{{ route('attendance.destroy', $attendance->attendance_id) }}" method="POST" class="d-inline">

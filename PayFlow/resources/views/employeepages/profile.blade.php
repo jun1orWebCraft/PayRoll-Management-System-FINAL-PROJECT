@@ -1,9 +1,20 @@
 @extends('layouts.employeeapp')
 
-@section('title', 'Profile Management')
-
 @section('content')
+
 <div class="container mt-2 mb-5">
+    <div class="container  mb-5">
+    <!-- TOP BAR: Date/Time + Notification -->
+    <div class="d-flex align-items-center justify-content-start mb-4 gap-3">
+    <!-- Dashboard Title -->
+    <h3 class="fw-bold mb-0">Profile Management</h3>
+
+    <!-- Current Date & Time -->
+    <div class="d-flex align-items-center justify-content-end gap-2 px-3 py-1 rounded-3 bg-light shadow-sm">
+        <i class="bi bi-clock fs-5 text-secondary"></i>
+        <span class="fw-medium" id="currentDateTime">Nov 6, 2025 10:00 AM</span>
+    </div>
+</div>
     <div class="row">
         <!-- LEFT PROFILE CARD -->
         <div class="col-lg-4 mb-4">

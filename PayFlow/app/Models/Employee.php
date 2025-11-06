@@ -101,6 +101,9 @@ class Employee extends Authenticatable
 
         return $year . '-' . str_pad($number, 3, '0', STR_PAD_LEFT);
     }
-  
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class, 'employee_id', 'employee_id');
+    }
 
 }

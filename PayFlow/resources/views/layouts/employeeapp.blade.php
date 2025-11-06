@@ -177,8 +177,8 @@ main {
     </aside>
 
     <main>
-      <header class="p-3 border-bottom">
-        <h1 class="h4 fw-bold">@yield('title','employee.dashboard')</h1>
+      <header >
+        <h1 class="h4 fw-bold">@yield('title','')</h1>
       </header>
       <div class="p-4">
         @yield('content')
@@ -202,6 +202,28 @@ main {
         menu.style.display = 'none';
       }
     });
+    function updateDateTime() {
+    const now = new Date();
+
+    // Format options
+    const options = {
+        year: 'numeric',
+        month: 'short', // e.g., Nov
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+    };
+
+    const formatted = now.toLocaleString('en-US', options);
+    document.getElementById('currentDateTime').textContent = formatted;
+}
+
+// Update immediately
+updateDateTime();
+
+// Update every minute
+setInterval(updateDateTime, 60000);
   </script>
 </body>
 </html>

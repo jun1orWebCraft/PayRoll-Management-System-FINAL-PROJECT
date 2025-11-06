@@ -14,31 +14,78 @@ use Illuminate\Support\Facades\Hash;
 
 class PayFlowController extends Controller
 {
-public function dashboard()   
-{
-    $user = auth()->user();
+    public function dashboard()
+    {
+        $user = auth()->user();
 
-    if ($user->name === 'Accountant') {
-        // Logic for accountant dashboard
-        // Example: show accountant-specific data or just a custom view
-        return view('accountant.dashboard', compact('user'));
-    } elseif ($user->name === 'HR') {
-        // HR dashboard logic as in your original code
-        $leaveRequests = LeaveRequest::with('employee')
-            ->orderBy('created_at', 'desc')
-            ->take(5)
-            ->get();
+        if ($user->name === 'Accountant') {
+            return view('accountant.dashboard', compact('user'));
+        } elseif ($user->name === 'HR') {
+            // ✅ Step 1: Automatically reset employees whose leave has ended
+            $today = \Carbon\Carbon::today();
+
+            $endedLeaves = LeaveRequest::where('status', 'Approved')
+                ->whereDate('end_date', '<', $today)
+                ->with('employee')
+                ->get();
+
+            foreach ($endedLeaves as $leave) {
+                if ($leave->employee && $leave->employee->status === 'On Leave') {
+                    $leave->employee->status = 'Active';
+                    $leave->employee->save();
+                }
+            }
+
+            // ✅ Step 2: Load dashboard data
+            $leaveRequests = LeaveRequest::with('employee')
+                ->orderBy('created_at', 'desc')
+                ->take(5)
+                ->get();
+
             $recentActivities = ActivityLog::orderBy('created_at', 'desc')
-            ->take(6) // limit to 6 entries
-            ->get();
+                ->take(6)
+                ->get();
 
-        $activeEmployees = Employee::where('status', 'Active')->count();
-        $onLeave = Employee::where('status', 'On Leave')->count();
-        $totalEmployees = Employee::count();
-        $pendingPayrolls = Payroll::where('status', 'Pending')->count();
-        return view('pages.dashboard', compact('totalEmployees', 'onLeave', 'activeEmployees', 'leaveRequests', 'pendingPayrolls', 'recentActivities'));
-    } 
+            $activeEmployees = Employee::where('status', 'Active')->count();
+            $onLeave = Employee::where('status', 'On Leave')->count();
+            $totalEmployees = Employee::count();
+            $pendingPayrolls = Payroll::where('status', 'Pending')->count();
+
+            return view('pages.dashboard', compact(
+                'totalEmployees', 'onLeave', 'activeEmployees', 'leaveRequests', 'pendingPayrolls', 'recentActivities'
+            ));
+        }
+    }
+
+    public function approve($leave_request_id)
+    {
+        // Find the leave request
+        $leave = LeaveRequest::findOrFail($leave_request_id);
+
+        // Update leave request status
+        $leave->status = 'Approved';
+        $leave->approved_by = auth()->id(); // optional: track who approved it
+        $leave->save();
+
+        // ✅ Update the employee’s status to "On Leave"
+        $employee = $leave->employee;
+        if ($employee) {
+            $employee->status = 'On Leave';
+            $employee->save();
+        }
+
+        return redirect()->back()->with('success', 'Leave request approved and employee set to On Leave.');
+    }
+public function reject($leave_request_id)
+{
+    $leave = LeaveRequest::findOrFail($leave_request_id);
+    $leave->status = 'Rejected';
+    $leave->save();
+
+    return redirect()->back()->with('success', 'Leave request rejected successfully.');
 }
+
+
 
 
     public function employees()  
