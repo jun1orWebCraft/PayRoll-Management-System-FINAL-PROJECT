@@ -147,6 +147,12 @@ class EmployeeController extends Controller
             'password' => 'nullable|min:6',
         ]);
 
+        // Store old values
+        $oldData = $employee->only([
+            'first_name', 'last_name', 'email', 'phone', 'address', 
+            'age', 'basic_salary', 'status', 'employment_type', 'position_id'
+        ]);
+
         if ($request->hasFile('profile_picture')) {
             if ($employee->profile_picture) {
                 Storage::disk('public')->delete($employee->profile_picture);
@@ -166,6 +172,26 @@ class EmployeeController extends Controller
             'employment_type' => $request->employment_type,
             'position_id' => $request->position_id,
             'profile_picture' => $employee->profile_picture,
+        ]);
+
+        $newData = $employee->only([
+            'first_name', 'last_name', 'email', 'phone', 'address', 
+            'age', 'basic_salary', 'status', 'employment_type', 'position_id'
+        ]);
+
+        $changes = [];
+        foreach ($oldData as $key => $value) {
+            if ($value != $newData[$key]) {
+                $changes[] = ucfirst(str_replace('_', ' ', $key)) . ": '{$value}' → '{$newData[$key]}'";
+            }
+        }
+
+        $changeDescription = count($changes) ? implode(', ', $changes) : 'No changes made';
+
+        ActivityLog::create([
+            'action' => "Updated Employee {$employee->first_name} {$employee->last_name}: {$changeDescription}",
+            'icon' => 'bi-person-check',
+            'color' => 'text-warning',
         ]);
 
         return redirect()->route('employees.index')->with('success', 'Employee updated successfully.');
