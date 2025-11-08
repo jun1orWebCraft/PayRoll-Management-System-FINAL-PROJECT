@@ -21,13 +21,12 @@
             <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
                 <div style="height: 120px;"></div>
                 <div class="card-body text-center">
-                 <img 
-    src="{{ $employee->profile_picture && file_exists(storage_path('app/public/' . $employee->profile_picture)) 
-            ? asset('storage/' . $employee->profile_picture) 
-            : asset('images/default-profile.png') }}"
-    alt="Profile Picture"
-    class="rounded-circle border border-3 border-white shadow-sm position-absolute"
-    style="width:180px; height:170px; top:30px; left:50%; transform:translateX(-50%);">
+                <img src="{{ $employee->profile_picture && file_exists(storage_path('app/public/' . $employee->profile_picture)) 
+                            ? asset('storage/' . $employee->profile_picture) 
+                            : asset('images/default-profile.png') }}"
+                    alt="Profile Picture"
+                    class="rounded-circle border border-3 border-white shadow-sm position-absolute"
+                    style="width:180px; height:170px; top:30px; left:50%; transform:translateX(-50%);">
 
                     <div class="mt-5 pt-5">
                         <h4 class="fw-bold">{{ $employee->full_name }}</h4>
@@ -155,12 +154,12 @@
         <div class="modal-body">
             <div class="text-center mb-3">
                 <img id="profilePreview" 
-     src="{{ $employee->profile_picture && file_exists(storage_path('app/public/' . $employee->profile_picture)) 
-            ? asset('storage/' . $employee->profile_picture) 
-            : asset('images/default-profile.png') }}"
-     alt="Profile Picture"
-     class="rounded-circle"
-     style="width:120px; height:120px;">
+                    src="{{ $employee->profile_picture && file_exists(storage_path('app/public/' . $employee->profile_picture)) 
+                            ? asset('storage/' . $employee->profile_picture) 
+                            : asset('images/default-profile.png') }}"
+                    alt="Profile Picture"
+                    class="rounded-circle"
+                    style="width:120px; height:120px;">
 
             </div>
 

@@ -33,9 +33,6 @@
                             @foreach($notifications as $notification)
                                 <li class="list-group-item d-flex justify-content-between align-items-center {{ $notification->is_read ? '' : 'fw-bold' }}">
                                     <span>{{ $notification->message }}</span>
-                                    @if($notification->link)
-                                        <a href="{{ $notification->link }}" class="btn btn-sm btn-primary">View</a>
-                                    @endif
                                 </li>
                             @endforeach
                         </ul>
