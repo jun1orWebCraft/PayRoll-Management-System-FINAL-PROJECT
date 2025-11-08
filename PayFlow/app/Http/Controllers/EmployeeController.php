@@ -341,7 +341,11 @@ class EmployeeController extends Controller
 
     public function settings()
     {
-        return view('employeepages.settings');
+        $employee = Auth::guard('employee')->user();
+
+        $employee->load('notificationPreference');
+
+        return view('employeepages.settings', compact('employee'));
     }
 
     public function request()
@@ -379,5 +383,27 @@ class EmployeeController extends Controller
         }
 
         return view('employeepages.request', compact('leaveTypes', 'leaveBalances'));
+    }
+    public function changePassword(Request $request)
+    {
+  
+        $request->validate([
+            'current_password' => 'required',
+            'new_password' => 'required|min:8',
+            'confirm_password' => 'required|same:new_password',
+        ]);
+
+        $employee = auth()->guard('employee')->user();
+
+        if (!$employee) {
+            return back()->withErrors(['error' => 'Employee not found or not logged in.']);
+        }
+        if (!Hash::check($request->current_password, $employee->password)) {
+            return back()->withErrors(['current_password' => 'Your current password is incorrect.']);
+        }
+        $employee->password = Hash::make($request->new_password);
+        $employee->save();
+
+        return back()->with('success', 'Password changed successfully!');
     }
 }

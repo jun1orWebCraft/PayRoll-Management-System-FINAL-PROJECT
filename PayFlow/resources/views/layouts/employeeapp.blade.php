@@ -151,28 +151,34 @@ main {
       </nav>
 
       <div class="sidebar-footer">
-        @if (Auth::check())
-        <div class="profile-container">
-          <div class="profile" id="profileButton">
-            <img src="{{ asset('images/profile.png') }}" alt="Profile photo">
-            <div>
-              <div style="font-size:14px">{{ Auth::user()->name }}</div>
-              <div style="font-size:12px;color:var(--muted)">{{ Auth::user()->email }}</div>
-            </div>
-          </div>
+          @if(auth()->guard('employee')->check())
+              @php
+                  $employee = auth()->guard('employee')->user();
+              @endphp
 
-          <div class="dropdown-menu" id="profileMenu">
-            <form method="POST" action="{{ route('logout') }}">
-              @csrf
-              <button type="submit" class="btn btn-danger btn-sm w-100">Log out</button>
-            </form>
-          </div>
-        </div>
-        @endif
+              <div class="profile-container">
+                  <div class="profile" id="profileButton">
+                      <img src="{{ $employee->profile_picture && file_exists(storage_path('app/public/' . $employee->profile_picture)) 
+                                  ? asset('storage/' . $employee->profile_picture) 
+                                  : asset('images/default-profile.png') }}" alt="Profile photo">
+                      <div>
+                          <div style="font-size:14px">{{ $employee->first_name }} {{ $employee->last_name }}</div>
+                          <div style="font-size:12px;color:var(--muted)">{{ $employee->email }}</div>
+                      </div>
+                  </div>
 
-        <div class="text-center mt-3">
-          © {{ date('Y') }} PayFlow
-        </div>
+                  <div class="dropdown-menu" id="profileMenu">
+                      <form method="POST" action="{{ route('logout') }}">
+                          @csrf
+                          <button type="submit" class="btn btn-danger btn-sm w-100">Log out</button>
+                      </form>
+                  </div>
+              </div>
+          @endif
+
+          <div class="text-center mt-3">
+              © {{ date('Y') }} PayFlow
+          </div>
       </div>
     </aside>
 

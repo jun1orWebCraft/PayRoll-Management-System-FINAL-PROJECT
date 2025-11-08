@@ -20,13 +20,38 @@
         <div class="card-body">
             <h5 class="card-title fw-bold">Notification Preferences</h5>
             <p class="text-muted">Email Notifications</p>
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
 
-            <form method="POST" action="">
+            @if($errors->any())
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <ul class="mb-0">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            {{-- 🔒 Notification Preferences Form --}}
+            <form method="POST" action="{{ route('notification.preferences.update') }}">
                 @csrf
                 @method('PUT')
 
+                {{-- ⚡ Get the logged-in employee and preference --}}
+                @php
+                    $employee = auth()->guard('employee')->user();
+                    $pref = optional($employee?->notificationPreference);
+                @endphp
+
                 <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" name="payslip_ready" id="payslip_ready" checked>
+                    <input class="form-check-input" type="checkbox" name="payslip_ready" id="payslip_ready"
+                        {{ $pref?->payslip_ready ? 'checked' : '' }}>
                     <label class="form-check-label fw-semibold" for="payslip_ready">
                         Payslip Ready
                     </label>
@@ -34,7 +59,8 @@
                 </div>
 
                 <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" name="leave_updates" id="leave_updates" checked>
+                    <input class="form-check-input" type="checkbox" name="leave_updates" id="leave_updates"
+                        {{ $pref?->leave_updates ? 'checked' : '' }}>
                     <label class="form-check-label fw-semibold" for="leave_updates">
                         Leave Updates
                     </label>
@@ -42,7 +68,8 @@
                 </div>
 
                 <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" name="benefits_information" id="benefits_information">
+                    <input class="form-check-input" type="checkbox" name="benefits_information" id="benefits_information"
+                        {{ $pref?->benefits_information ? 'checked' : '' }}>
                     <label class="form-check-label fw-semibold" for="benefits_information">
                         Benefits Information
                     </label>
@@ -50,7 +77,8 @@
                 </div>
 
                 <div class="form-check mb-3">
-                    <input class="form-check-input" type="checkbox" name="important_reminders" id="important_reminders" checked>
+                    <input class="form-check-input" type="checkbox" name="important_reminders" id="important_reminders"
+                        {{ $pref?->important_reminders ? 'checked' : '' }}>
                     <label class="form-check-label fw-semibold" for="important_reminders">
                         Important Reminders
                     </label>
@@ -64,12 +92,31 @@
         </div>
     </div>
 
+
+
     {{-- Change Password --}}
     <div class="card mb-4">
         <div class="card-body">
             <h5 class="card-title fw-bold">Change Password</h5>
+            @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
 
-            <form method="POST" action="">
+            @if ($errors->any())
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('employee.changePassword') }}">
                 @csrf
                 @method('PUT')
 
@@ -94,20 +141,5 @@
             </form>
         </div>
     </div>
-
-    {{-- Two-Factor Authentication --}}
-    <div class="card mb-5">
-        <div class="card-body">
-            <h5 class="card-title fw-bold">Two-Factor Authentication</h5>
-            <p class="text-muted mb-3">
-                SMS Authentication<br>
-                <span class="small">Receive security codes via text message</span>
-            </p>
-            <button class="btn btn-outline-primary" type="button">
-                <i class="bi bi-shield-lock me-1"></i> Enable
-            </button>
-        </div>
-    </div>
-
 </div>
 @endsection

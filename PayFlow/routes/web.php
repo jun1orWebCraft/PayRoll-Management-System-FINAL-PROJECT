@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\LeaveRequestController;
+use App\Http\Controllers\NotificationPreferenceController;
 
 Route::middleware('web')->group(function () {
 
@@ -68,7 +69,9 @@ Route::middleware('web')->group(function () {
             Route::resource('leave-requests', LeaveRequestController::class);
             Route::get('/settings', [EmployeeController::class, 'settings'])->name('employee.settings');
             Route::resource('employee', EmployeeController::class);
+            Route::put('/change-password', [EmployeeController::class, 'changePassword'])->name('employee.changePassword');
             Route::post('/notifications/mark-all-read', [EmployeeController::class, 'markAllRead'])->name('notifications.markAllRead');
+            Route::put('/notification-preferences', [NotificationPreferenceController::class, 'update'])->name('notification.preferences.update');
         });
     });
 
