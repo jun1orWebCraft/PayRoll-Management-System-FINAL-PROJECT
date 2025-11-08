@@ -63,31 +63,38 @@
                     <i class="bi bi-cash-stack me-2"></i> Recent Payrolls
                 </div>
                 <div class="card-body">
-                   @forelse($recentPayrolls ?? [] as $payroll)
-                     <div class="d-flex align-items-center justify-content-between border-bottom py-3">
-                      <div class="d-flex align-items-center">
-                       <div class="rounded-circle bg-light p-2 me-3">
-                         <i class="bi bi-person-circle fs-4 text-primary"></i>
-                     </div>
-                 <div>
-                <h6 class="mb-0 fw-semibold">{{ $payroll->employee->name ?? 'N/A' }}</h6>
-                <small class="text-muted">
-                    {{ \Carbon\Carbon::parse($payroll->pay_period_start)->format('M d') }} - {{ \Carbon\Carbon::parse($payroll->pay_period_end)->format('M d, Y') }}
-                </small>
-            </div>
-         </div>
-        <div class="text-end">
-            <h6 class="fw-bold text-success mb-0">₱{{ number_format($payroll->net_salary, 2) }}</h6>
-            <small class="text-muted">{{ $payroll->status }}</small>
-        </div>
-    </div>
-@empty
-    <p class="text-muted text-center py-4 mb-0">No recent payroll records found.</p>
-@endforelse
-
+                    @forelse($recentPayrolls ?? [] as $payroll)
+                        @php
+                            $employee = $payroll->employee;
+                        @endphp
+                        <div class="d-flex align-items-center justify-content-between border-bottom py-3">
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle bg-light p-2 me-3">
+                                    <img src="{{ $employee && $employee->profile_picture && file_exists(storage_path('app/public/' . $employee->profile_picture)) 
+                                            ? asset('storage/' . $employee->profile_picture) 
+                                            : asset('images/default-profile.png') }}" 
+                                        alt="Profile photo" class="rounded-circle" width="50" height="50">
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-semibold">{{ $employee->first_name ?? '' }} {{ $employee->last_name ?? '' }}</h6>
+                                    <small class="text-muted">
+                                        {{ \Carbon\Carbon::parse($payroll->pay_period_start)->format('M d') }} - 
+                                        {{ \Carbon\Carbon::parse($payroll->pay_period_end)->format('M d, Y') }}
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <h6 class="fw-bold text-success mb-0">₱{{ number_format($payroll->net_pay ?? 0, 2) }}</h6>
+                                <small class="text-muted">{{ $payroll->status ?? 'N/A' }}</small>
+                            </div>
+                        </div>
+                    @empty
+                        <p class="text-muted text-center py-4 mb-0">No recent payroll records found.</p>
+                    @endforelse
                 </div>
             </div>
         </div>
+
 
         {{-- Attendance Overview --}}
         <div class="col-lg-5">

@@ -37,8 +37,8 @@
             <div class="col-md-3">
                 <select name="status" class="form-select shadow-sm" onchange="this.form.submit()">
                     <option value="">All Status</option>
-                    <option value="Active" {{ request('status') == 'Active' ? 'selected' : '' }}>Active</option>
-                    <option value="Inactive" {{ request('status') == 'Inactive' ? 'selected' : '' }}>Inactive</option>
+                    <option value="Processed" {{ request('status') == 'Processed' ? 'selected' : '' }}>Processed</option>
+                    <option value="Pending" {{ request('status') == 'Pending' ? 'selected' : '' }}>Pending</option>
                 </select>
             </div>
         </div>
@@ -49,7 +49,7 @@
         <table class="table table-hover align-middle text-center mb-0">
             <thead class="table-primary">
                 <tr>
-                    <th>Employee No</th>
+                    <th>Employee ID</th>
                     <th>Employee Name</th>
                     <th>Position</th>
                     <th>Pay Period</th>
@@ -61,21 +61,25 @@
             </thead>
             <tbody>
                 @forelse($payrolls as $payroll)
+                    @php
+                        $employee = $payroll->employee ?? null;
+                        $position = $employee->position ?? null;
+                    @endphp
                     <tr>
-                        <td>{{ $payroll->employee->employee_no }}</td>
-                        <td class="fw-semibold">{{ $payroll->employee->first_name }} {{ $payroll->employee->last_name }}</td>
-                        <td>{{ $payroll->employee->position->position_name }}</td>
+                        <td>{{ $employee->employee_id ?? 'N/A' }}</td>
+                        <td class="fw-semibold">{{ $employee->first_name ?? '' }} {{ $employee->last_name ?? '' }}</td>
+                        <td>{{ $position->position_name ?? 'N/A' }}</td>
                         <td>{{ $payroll->pay_period_start }} - {{ $payroll->pay_period_end }}</td>
-                        <td>₱{{ number_format($payroll->basic_salary + $payroll->overtime_pay, 2) }}</td>
-                        <td>₱{{ number_format($payroll->deductions, 2) }}</td>
-                        <td class="fw-bold text-success">₱{{ number_format($payroll->net_pay, 2) }}</td>
+                        <td>₱{{ number_format(($payroll->basic_salary ?? 0) + ($payroll->overtime_pay ?? 0), 2) }}</td>
+                        <td>₱{{ number_format($payroll->deductions ?? 0, 2) }}</td>
+                        <td class="fw-bold text-success">₱{{ number_format($payroll->net_pay ?? 0, 2) }}</td>
                         <td>
                             <button class="btn btn-link text-primary p-0 border-0 shadow-none me-2"
                                     data-bs-toggle="modal"
-                                    data-bs-target="#viewPayrollModal{{ $payroll->payroll_id }}">
+                                    data-bs-target="#viewPayrollModal{{ $payroll->id }}">
                                 <i class="bi bi-eye fs-5"></i>
                             </button>
-                            <form action="{{ route('payroll.destroy', $payroll->payroll_id) }}" method="POST" class="d-inline">
+                            <form action="{{ route('accountant.payrollprocessing.destroy', $payroll->payroll_id) }}" method="POST" class="d-inline">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-link text-danger p-0" onclick="return confirm('Delete payroll record?')">
@@ -86,7 +90,7 @@
                     </tr>
 
                     {{-- View Payroll Modal --}}
-                    <div class="modal fade" id="viewPayrollModal{{ $payroll->payroll_id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal fade" id="viewPayrollModal{{ $payroll->id }}" tabindex="-1" aria-hidden="true">
                         <div class="modal-dialog modal-lg modal-dialog-centered">
                             <div class="modal-content border-0 rounded-4 shadow-lg">
                                 <div class="modal-header bg-success text-white border-0">
@@ -97,11 +101,11 @@
                                     <div class="row g-3">
                                         <div class="col-md-6">
                                             <label class="fw-semibold text-muted">Employee</label>
-                                            <p>{{ $payroll->employee->first_name }} {{ $payroll->employee->last_name }}</p>
+                                            <p>{{ $employee->first_name ?? '' }} {{ $employee->last_name ?? '' }}</p>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="fw-semibold text-muted">Position</label>
-                                            <p>{{ $payroll->employee->position->position_name }}</p>
+                                            <p>{{ $position->position_name ?? 'N/A' }}</p>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="fw-semibold text-muted">Pay Period</label>
@@ -109,19 +113,19 @@
                                         </div>
                                         <div class="col-md-6">
                                             <label class="fw-semibold text-muted">Basic Salary</label>
-                                            <p>₱{{ number_format($payroll->basic_salary, 2) }}</p>
+                                            <p>₱{{ number_format($payroll->basic_salary ?? 0, 2) }}</p>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="fw-semibold text-muted">Overtime Pay</label>
-                                            <p>₱{{ number_format($payroll->overtime_pay, 2) }}</p>
+                                            <p>₱{{ number_format($payroll->overtime_pay ?? 0, 2) }}</p>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="fw-semibold text-muted">Deductions</label>
-                                            <p>₱{{ number_format($payroll->deductions, 2) }}</p>
+                                            <p>₱{{ number_format($payroll->deductions ?? 0, 2) }}</p>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="fw-semibold text-muted">Net Pay</label>
-                                            <p class="fw-bold text-success">₱{{ number_format($payroll->net_pay, 2) }}</p>
+                                            <p class="fw-bold text-success">₱{{ number_format($payroll->net_pay ?? 0, 2) }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -149,7 +153,7 @@
                     <h5 class="modal-title fw-semibold">Add Payroll Record</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="{{ route('payroll.store') }}" method="POST">
+                <form action="{{ route('accountant.payrollprocessing.store') }}" method="POST">
                     @csrf
                     <div class="modal-body">
                         <div class="row g-3">
@@ -159,7 +163,7 @@
                                     <option value="">Select Employee</option>
                                     @foreach($employees as $emp)
                                         <option value="{{ $emp->employee_id }}">
-                                            {{ $emp->first_name }} {{ $emp->last_name }} - {{ $emp->position->position_name }}
+                                            {{ $emp->first_name }} {{ $emp->last_name }} - {{ $emp->position->position_name ?? 'N/A' }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -173,12 +177,8 @@
                                 <input type="date" name="pay_period_end" class="form-control" required>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Overtime Pay</label>
-                                <input type="number" step="0.01" name="overtime_pay" class="form-control">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Deductions (Auto)</label>
-                                <input type="number" step="0.01" name="deductions" class="form-control" placeholder="Auto-calculated based on position" readonly>
+                                <label class="form-label">Overtime Hours</label>
+                                <input type="number" step="0.01" name="overtime_hours" class="form-control">
                             </div>
                         </div>
                     </div>

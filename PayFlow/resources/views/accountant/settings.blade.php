@@ -23,27 +23,44 @@
                     <h5 class="fw-bold mb-0">Account Settings</h5>
                 </div>
                 <p class="text-muted small mb-3">Update your personal details and login credentials</p>
-
-                <form>
+                @if(session('success'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+                <form method="POST" action="{{ route('account.update.password') }}">
+                    @csrf
+                    {{-- Current Password --}}
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Full Name</label>
-                        <input type="text" class="form-control rounded-3" value="{{ auth()->user()->name }}" readonly>
+                        <label class="form-label fw-semibold">Current Password</label>
+                        <input type="password" name="current_password" class="form-control rounded-3 @error('current_password') is-invalid @enderror" placeholder="Enter current password" required>
+                        @error('current_password')
+                            <span class="text-danger small">{{ $message }}</span>
+                        @enderror
                     </div>
 
+                    {{-- New Password --}}
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Email Address</label>
-                        <input type="email" class="form-control rounded-3" value="{{ auth()->user()->email }}" readonly>
+                        <label class="form-label fw-semibold">New Password</label>
+                        <input type="password" name="new_password" class="form-control rounded-3 @error('new_password') is-invalid @enderror" placeholder="Enter new password" required>
+                        @error('new_password')
+                            <span class="text-danger small">{{ $message }}</span>
+                        @enderror
                     </div>
 
+                    {{-- Confirm New Password --}}
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Change Password</label>
-                        <input type="password" class="form-control rounded-3" placeholder="Enter new password">
+                        <label class="form-label fw-semibold">Confirm New Password</label>
+                        <input type="password" name="new_password_confirmation" class="form-control rounded-3" placeholder="Confirm new password" required>
                     </div>
 
-                    <button type="submit" class="btn btn-primary rounded-3 w-100">Update Account</button>
+                    <button type="submit" class="btn btn-primary rounded-3 w-100">Update Password</button>
                 </form>
+
             </div>
         </div>
+
 
         {{-- System Settings --}}
         <div class="col-md-6">

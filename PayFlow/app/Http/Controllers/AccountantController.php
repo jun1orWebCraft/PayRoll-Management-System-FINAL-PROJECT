@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Payroll;
 use App\Models\Attendance;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Auth;
 class AccountantController extends Controller
 {
     public function dashboard()
@@ -15,7 +15,7 @@ class AccountantController extends Controller
         $totalDeductions = Payroll::sum('deductions');
         $processedPayrolls = Payroll::where('status', 'Processed')->count();
         $pendingPayrolls = Payroll::where('status', 'Pending')->count();
-
+        
         // ✅ Fetch the 5 most recent payrolls
         $recentPayrolls = Payroll::with('employee')
             ->latest()
