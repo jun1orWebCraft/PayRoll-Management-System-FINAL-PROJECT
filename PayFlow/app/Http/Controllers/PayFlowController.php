@@ -142,7 +142,7 @@ public function reject($leave_request_id)
     $attendanceCounts = $weekDays->values();
 
     // ✅ Compute Average Attendance Rate
-    $totalEmployees = \App\Models\Employee::count(); // total employees
+    $totalEmployees = Employee::count(); // total employees
     $totalAttendance = Attendance::whereBetween('date', [$startOfWeek, $endOfWeek])
         ->where('status', 'Present')
         ->count();
@@ -155,7 +155,7 @@ public function reject($leave_request_id)
         : 0;
     $averageSalary = Payroll::avg('basic_salary') ?? 0;
     $totalPayrollCost = Payroll::sum('net_pay') ?? 0;
-    $totalDeduction = Deduction::sum('amount') ?? 0;
+    $totalDeduction = Payroll::sum('deductions') ?? 0;
     // Pass all data to view
     return view('pages.reports', compact(
         'labels',

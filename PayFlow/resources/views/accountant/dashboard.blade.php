@@ -33,7 +33,7 @@
             <div class="card border-0 shadow-sm rounded-4 text-center p-4 bg-gradient bg-light">
                 <i class="bi bi-dash-circle text-danger fs-2 mb-2"></i>
                 <h6 class="text-muted">Total Deduction</h6>
-                <h4 class="fw-bold text-dark">₱{{ number_format($totalDeduction ?? 0, 2) }}</h4>
+                <h4 class="fw-bold text-dark">₱{{ number_format($totalDeductions ?? 0, 2) }}</h4>
             </div>
         </div>
 
