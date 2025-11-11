@@ -49,7 +49,7 @@
         <table class="table table-hover align-middle text-center mb-0">
             <thead class="table-primary">
                 <tr>
-                    <th>Employee ID</th>
+                    <th>Employee No</th>
                     <th>Employee Name</th>
                     <th>Position</th>
                     <th>Pay Period</th>
@@ -66,7 +66,7 @@
                         $position = $employee->position ?? null;
                     @endphp
                     <tr>
-                        <td>{{ $employee->employee_id ?? 'N/A' }}</td>
+                        <td>{{ $employee->employee_no ?? 'N/A' }}</td>
                         <td class="fw-semibold">{{ $employee->first_name ?? '' }} {{ $employee->last_name ?? '' }}</td>
                         <td>{{ $position->position_name ?? 'N/A' }}</td>
                         <td>{{ $payroll->pay_period_start }} - {{ $payroll->pay_period_end }}</td>
