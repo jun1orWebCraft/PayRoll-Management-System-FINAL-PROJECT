@@ -130,10 +130,6 @@
             <div class="card shadow-sm border-0 rounded-4 mt-4 p-3">
                 <h6 class="fw-bold mb-3">Quick Actions</h6>
                 <div class="d-flex gap-2">
-                    <a href="#" class="btn btn-outline-primary flex-fill">View Attendance</a>
-                    <a href="#" class="btn btn-outline-secondary flex-fill">Payroll History</a>
-
-                    <!-- Edit Profile Modal Trigger -->
                     <a href="#" class="btn btn-outline-success flex-fill" data-bs-toggle="modal" data-bs-target="#editProfileModal">Edit Profile</a>
                 </div>
             </div>

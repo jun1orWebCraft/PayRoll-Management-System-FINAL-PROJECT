@@ -47,8 +47,16 @@ class AttendanceController extends Controller
 
     public function store(Request $request)
     {
-        $qrData = $request->input('qr_data');
+        return $this->processAttendance($request->input('qr_data'));
+    }
 
+    public function storeScanner(Request $request)
+    {
+        return $this->processAttendance($request->input('qr_data'));
+    }
+
+    private function processAttendance($qrData)
+    {
         $employee = Employee::where('employee_no', $qrData)
                             ->orWhere('QR_code', $qrData)
                             ->first();

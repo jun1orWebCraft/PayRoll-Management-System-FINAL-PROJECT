@@ -33,10 +33,11 @@ Route::middleware('web')->group(function () {
     
     Route::post('reset-password', [NewPasswordController::class, 'store'])->name('password.update');
 
-    Route::get('/attendance/scanner', [AttendanceController::class, 'scanner'])->name('attendance.scanner');
-
+    Route::get('/attendance-scanner', [AttendanceController::class, 'scanner'])->name('attendance.scanner');
+    Route::post('/attendance-scanner/store', [AttendanceController::class, 'storeScanner'])->name('attendance.scanner.store');
+    
     Route::middleware('auth')->group(function () {
-        Route::get('/', [PayFlowController::class, 'dashboard'])->name('dashboard');
+        Route::get('/', [PayFlowController::class, 'dashboard'])->name('dashboard'); 
         Route::get('/employees', [PayFlowController::class, 'employees'])->name('employees');
         Route::get('/attendance', [PayFlowController::class, 'attendance'])->name('attendance');
         Route::get('/payrolldata', [PayFlowController::class, 'payrolldata'])->name('payrolldata');
