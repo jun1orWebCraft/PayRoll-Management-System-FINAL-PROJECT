@@ -18,6 +18,7 @@ use App\Mail\EmployeeWelcomeMail;
 use App\Models\LeaveRequest;
 use App\Models\Notification;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class EmployeeController extends Controller
 {
@@ -436,9 +437,15 @@ class EmployeeController extends Controller
     public function viewPayslip($payrollId)
     {
         $payroll = Payroll::with('employee')->findOrFail($payrollId);
-
-        // Return the Blade view as a string
         return view('employeepages.payslip_modal', compact('payroll'))->render();
+    }
+    public function downloadPayslip($payrollId)
+    {
+        $payroll = Payroll::with('employee')->findOrFail($payrollId);
+        $pdf = Pdf::loadView('employeepages.payslip_pdf', compact('payroll'));
+
+        $fileName = 'Payslip_' . $payroll->employee->employee_no . '_' . now()->format('Ymd') . '.pdf';
+        return $pdf->download($fileName);
     }
 
 }
