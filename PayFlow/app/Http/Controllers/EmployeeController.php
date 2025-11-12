@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Employee;
+use App\Models\Payroll;
 use App\Models\Attendance;
 use App\Models\ActivityLog;
 use App\Models\Position;
@@ -432,4 +433,12 @@ class EmployeeController extends Controller
 
         return back()->with('success', 'Password changed successfully!');
     }
+    public function viewPayslip($payrollId)
+    {
+        $payroll = Payroll::with('employee')->findOrFail($payrollId);
+
+        // Return the Blade view as a string
+        return view('employeepages.payslip_modal', compact('payroll'))->render();
+    }
+
 }

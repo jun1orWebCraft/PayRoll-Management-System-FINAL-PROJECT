@@ -77,6 +77,10 @@ Route::middleware('web')->group(function () {
             Route::put('/change-password', [EmployeeController::class, 'changePassword'])->name('employee.changePassword');
             Route::post('/notifications/mark-all-read', [EmployeeController::class, 'markAllRead'])->name('notifications.markAllRead');
             Route::put('/notification-preferences', [NotificationPreferenceController::class, 'update'])->name('notification.preferences.update');
+            Route::get('/payslip/{payroll}', [EmployeeController::class, 'viewPayslip'])
+            ->name('employee.payslip.view');
+            Route::get('/payslip/{payroll}/download', [EmployeeController::class, 'downloadPayslip'])
+            ->name('employee.payslip.download');
         });
     });
 

@@ -109,7 +109,7 @@
                 <div class="col-md-6">
                     <div class="card shadow-sm border-0 rounded-4 p-3">
                         <h6 class="text-muted"><i class="bi bi-cash-stack me-2"></i>Basic Salary</h6>
-                        <p class="fw-semibold mb-0">${{ number_format($employee->basic_salary, 2) }}</p>
+                        <p class="fw-semibold mb-0">₱{{ number_format($employee->basic_salary, 2) }}</p>
                         <small class="text-muted">Annual base salary</small>
                         <small class="text-success">Position: {{ $employee->position->position_name ?? '-' }}</small>
                     </div>
