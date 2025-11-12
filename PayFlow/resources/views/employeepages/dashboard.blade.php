@@ -184,12 +184,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <a href="javascript:void(0)" 
-                                    class="text-decoration-none me-2 viewPayslipBtn" 
-                                    data-payroll-id="{{ $payroll->payroll_id }}" 
-                                    data-bs-toggle="modal" 
-                                    data-bs-target="#payslipModal">
-                                        <i class="bi bi-eye"></i>
+                                    <a href="javascript:void(0)" class="text-decoration-none me-2 viewPayslipBtn" data-payroll-id="{{ $payroll->payroll_id }}" data-bs-toggle="modal" data-bs-target="#payslipModal"><i class="bi bi-eye"></i>
                                     </a>
                                     <a href="{{ route('employee.payslip.download', $payroll->payroll_id) }}" class="text-decoration-none">
                                         <i class="bi bi-download"></i>

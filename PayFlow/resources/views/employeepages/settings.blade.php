@@ -16,12 +16,6 @@
         <div class="card-body">
             <h5 class="card-title fw-bold">Notification Preferences</h5>
             <p class="text-muted">Email Notifications</p>
-            @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
 
             @if($errors->any())
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -38,7 +32,6 @@
             <form method="POST" action="{{ route('notification.preferences.update') }}">
                 @csrf
                 @method('PUT')
-
                 {{-- ⚡ Get the logged-in employee and preference --}}
                 @php
                     $employee = auth()->guard('employee')->user();
@@ -87,8 +80,6 @@
             </form>
         </div>
     </div>
-
-
 
     {{-- Change Password --}}
     <div class="card mb-4">
