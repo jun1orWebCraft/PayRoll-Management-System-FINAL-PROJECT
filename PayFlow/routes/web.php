@@ -59,8 +59,11 @@ Route::middleware('web')->group(function () {
         Route::get('/accountant/payrollprocessing/{id}/edit', [PayrollController::class, 'edit'])->name('accountant.payrollprocessing.edit');
         Route::put('/accountant/payrollprocessing/{id}', [PayrollController::class, 'update'])->name('accountant.payrollprocessing.update');
         Route::delete('/accountant/payrollprocessing/{id}', [PayrollController::class, 'destroy'])->name('accountant.payrollprocessing.destroy');
-        Route::get('/accountant/deductions', [DeductionController::class, 'deduction'])->name('accountant.deductions');
-        Route::post('/deductions/store', [DeductionController::class, 'store'])->name('deductions.store');
+        Route::prefix('accountant')->group(function () { Route::get('deductions', [DeductionController::class, 'deduction']) ->name('accountant.deductions'); 
+        Route::post('accountant/deductions/store', [DeductionController::class, 'store'])
+         ->name('accountant.deductions.store'); // POST - store a deduction
+});
+
         Route::get('/accountant/settings', [AccountantController::class, 'settings'])->name('accountant.settings');
         Route::post('/accountant/update-password', [PayrollController::class, 'updatePassword'])->name('account.update.password');
     });

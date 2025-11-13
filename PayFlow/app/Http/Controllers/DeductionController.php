@@ -9,34 +9,44 @@ use Carbon\Carbon;
 
 class DeductionController extends Controller
 {
+    // Display all deductions
     public function deduction()
     {
-        // Eager load employee relation
-    $deductions = Deduction::with('employee')
-                    ->orderBy('deduction_date', 'desc')
-                    ->get();
+        // Load deductions with employee data
+        $deductions = Deduction::with('employee')
+                        ->orderBy('deduction_date', 'desc')
+                        ->get();
 
-    $employees = Employee::where('employment_type', 'Full-Time')->get();
+        $employees = Employee::where('employment_type', 'Full-Time')->get();
 
-    return view('accountant.deduction', compact('deductions', 'employees'));
+        return view('accountant.deduction', compact('deductions', 'employees'));
     }
 
     public function store(Request $request)
-{
+    {
     $request->validate([
         'employee_id' => 'required|exists:employees,id',
         'deduction_date' => 'nullable|date',
     ]);
 
     $employee = Employee::findOrFail($request->employee_id);
-    $monthlySalary = $employee->monthly_salary;
+    $monthlySalary = $employee->monthly_salary ?? $employee->basic_salary ?? 0;
 
-    $sss = $employee->is_availing_sss ? $monthlySalary * 0.05 : 0;
-    $philhealth = $employee->is_availing_philhealth ? max(500, min($monthlySalary * 0.025, 2500)) : 0;
-    $pagibig = $employee->is_availing_pagibig ? 100 : 0;
-    $withholdingTax = $employee->is_subject_to_tax ? $this->computeWithholdingTax($monthlySalary) : 0;
+    // Check which deductions were selected in the modal
+    $sss = $request->has('sss') && $employee->is_availing_sss ? $monthlySalary * 0.05 : 0;
+    $philhealth = $request->has('philhealth') && $employee->is_availing_philhealth 
+        ? max(500, min($monthlySalary * 0.025, 2500)) 
+        : 0;
+    $pagibig = $request->has('pagibig') && $employee->is_availing_pagibig ? 100 : 0;
+    $withholdingTax = $request->has('withholding_tax') && $employee->is_subject_to_tax
+        ? $this->computeWithholdingTax($monthlySalary)
+        : 0;
 
     $total = $sss + $philhealth + $pagibig + $withholdingTax;
+
+    $deductionDate = $request->deduction_date 
+        ? Carbon::parse($request->deduction_date) 
+        : Carbon::now();
 
     Deduction::create([
         'employee_id' => $employee->id,
@@ -45,12 +55,15 @@ class DeductionController extends Controller
         'pagibig' => $pagibig,
         'withholding_tax' => $withholdingTax,
         'total_deduction' => $total,
-        'deduction_date' => $request->deduction_date ?? Carbon::now(),
+        'deduction_date' => $deductionDate,
     ]);
 
-    return redirect()->route('accountant.deduction')->with('success', 'Deduction computed successfully!');
-}
+    return redirect()->route('accountant.deductions')
+                     ->with('success', 'Deduction computed successfully!');
+    }
 
+
+    // Compute monthly withholding tax
     private function computeWithholdingTax($monthlySalary)
     {
         $annual = $monthlySalary * 12;

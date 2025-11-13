@@ -80,7 +80,7 @@
                     <h5 class="modal-title fw-semibold">Compute Deduction</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="{{ route('deductions.store') }}" method="POST">
+                <form action="{{ route('accountant.deductions.store') }}" method="POST">
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">

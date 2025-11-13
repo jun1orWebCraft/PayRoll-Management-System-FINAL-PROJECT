@@ -57,114 +57,127 @@
 
     {{-- Payroll Table --}}
     <div class="table-responsive bg-white rounded-4 shadow-sm border">
-        <table class="table table-hover align-middle text-center mb-0">
-            <thead class="table-primary">
-                <tr>
-                    <th>Employee No</th>
-                    <th>Employee Name</th>
-                    <th>Position</th>
-                    <th>Pay Period</th>
-                    <th>Gross Pay</th>
-                    <th>Deductions</th>
-                    <th>Net Pay</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($payrolls as $payroll)
-                    @php
-                        $employee = $payroll->employee ?? null;
-                        $position = $employee->position ?? null;
-                    @endphp
+        {{-- Horizontal scroll wrapper --}}
+        <div style="overflow-x: auto; max-width: 100%;">
+            <table class="table table-hover align-middle text-center mb-0" style="min-width: 900px;">
+                <thead class="table-primary">
                     <tr>
-                        <td>{{ $employee->employee_no ?? 'N/A' }}</td>
-                        <td class="fw-semibold">{{ $employee->first_name ?? '' }} {{ $employee->last_name ?? '' }}</td>
-                        <td>{{ $position->position_name ?? 'N/A' }}</td>
-                        <td>{{ $payroll->pay_period_start }} - {{ $payroll->pay_period_end }}</td>
-                        <td>₱{{ number_format(($payroll->basic_salary ?? 0) + ($payroll->overtime_pay ?? 0), 2) }}</td>
-                        <td>₱{{ number_format($payroll->deductions ?? 0, 2) }}</td>
-                        <td class="fw-bold text-success">₱{{ number_format($payroll->net_pay ?? 0, 2) }}</td>
-                        <td>
-                            <span class="badge bg-{{ $payroll->status == 'Processed' ? 'info' : ($payroll->status == 'Paid' ? 'success' : 'secondary') }}">
-                                {{ $payroll->status }}
-                            </span>
-                        </td>
-                        <td>
-                            <button class="btn btn-link text-primary p-0 me-2"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#viewPayrollModal{{ $payroll->payroll_id }}">
-                                <i class="bi bi-eye fs-5"></i>
-                            </button>
-
-                            <form action="{{ route('accountant.payrollprocessing.destroy', $payroll->payroll_id) }}" method="POST" class="d-inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-link text-danger p-0"
-                                        onclick="return confirm('Delete payroll record?')">
-                                    <i class="bi bi-trash fs-5"></i>
-                                </button>
-                            </form>
-                        </td>
+                        <th>Employee No</th>
+                        <th>Employee Name</th>
+                        <th>Position</th>
+                        <th>Pay Period</th>
+                        <th>Gross Pay</th>
+                        <th>Deductions</th>
+                        <th>Net Pay</th>
+                        <th>Status</th>
+                        <th>Actions</th>
                     </tr>
+                </thead>
+                <tbody>
+                    @forelse($payrolls as $payroll)
+                        @php
+                            $employee = $payroll->employee ?? null;
+                            $position = $employee->position ?? null;
+                        @endphp
+                        <tr>
+                            <td style="white-space: nowrap;">{{ $employee->employee_no ?? 'N/A' }}</td>
+                            <td class="fw-semibold text-truncate" style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                {{ $employee->first_name ?? '' }} {{ $employee->last_name ?? '' }}
+                            </td>
+                            <td style="white-space: nowrap;">{{ $position->position_name ?? 'N/A' }}</td>
+                            <td style="white-space: nowrap;">{{ $payroll->pay_period_start }} - {{ $payroll->pay_period_end }}</td>
+                            <td style="white-space: nowrap;">₱{{ number_format(($payroll->basic_salary ?? 0) + ($payroll->overtime_pay ?? 0), 2) }}</td>
+                            <td style="white-space: nowrap;">₱{{ number_format($payroll->deductions ?? 0, 2) }}</td>
+                            <td class="fw-bold text-success" style="white-space: nowrap;">₱{{ number_format($payroll->net_pay ?? 0, 2) }}</td>
+                            <td style="white-space: nowrap;">
+                                <span class="badge bg-{{ $payroll->status == 'Processed' ? 'info' : ($payroll->status == 'Paid' ? 'success' : 'secondary') }}">
+                                    {{ $payroll->status }}
+                                </span>
+                            </td>
+                            <td style="white-space: nowrap;">
+                                {{-- Edit Button --}}
+                                <a href="{{ route('accountant.payrollprocessing.edit', $payroll->payroll_id) }}" class="btn btn-link text-warning p-0 me-2" title="Edit Payroll">
+                                    <i class="bi bi-pencil-square fs-5"></i>
+                                </a>
 
-                    {{-- View Payroll Modal --}}
-                    <div class="modal fade" id="viewPayrollModal{{ $payroll->payroll_id }}" tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog modal-lg modal-dialog-centered">
-                            <div class="modal-content border-0 rounded-4 shadow-lg">
-                                <div class="modal-header bg-success text-white border-0">
-                                    <h5 class="modal-title fw-semibold">Payroll Details</h5>
-                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <label class="fw-semibold text-muted">Employee</label>
-                                            <p>{{ $employee->first_name ?? '' }} {{ $employee->last_name ?? '' }}</p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="fw-semibold text-muted">Position</label>
-                                            <p>{{ $position->position_name ?? 'N/A' }}</p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="fw-semibold text-muted">Pay Period</label>
-                                            <p>{{ $payroll->pay_period_start }} - {{ $payroll->pay_period_end }}</p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="fw-semibold text-muted">Basic Salary</label>
-                                            <p>₱{{ number_format($payroll->basic_salary ?? 0, 2) }}</p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="fw-semibold text-muted">Overtime Pay</label>
-                                            <p>₱{{ number_format($payroll->overtime_pay ?? 0, 2) }}</p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="fw-semibold text-muted">Deductions</label>
-                                            <p>₱{{ number_format($payroll->deductions ?? 0, 2) }}</p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="fw-semibold text-muted">Net Pay</label>
-                                            <p class="fw-bold text-success">₱{{ number_format($payroll->net_pay ?? 0, 2) }}</p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="fw-semibold text-muted">Payment Date</label>
-                                            <p>{{ $payroll->payment_date ?? 'N/A' }}</p>
+                                {{-- View Button --}}
+                                <button class="btn btn-link text-primary p-0 me-2"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#viewPayrollModal{{ $payroll->payroll_id }}"
+                                        title="View Payroll Details">
+                                    <i class="bi bi-eye fs-5"></i>
+                                </button>
+
+                                {{-- Delete Form --}}
+                                <form action="{{ route('accountant.payrollprocessing.destroy', $payroll->payroll_id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-link text-danger p-0" onclick="return confirm('Delete payroll record?')" title="Delete Payroll">
+                                        <i class="bi bi-trash fs-5"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+
+                        {{-- View Payroll Modal --}}
+                        <div class="modal fade" id="viewPayrollModal{{ $payroll->payroll_id }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
+                                <div class="modal-content border-0 rounded-4 shadow-lg">
+                                    <div class="modal-header bg-success text-white border-0">
+                                        <h5 class="modal-title fw-semibold">Payroll Details</h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="fw-semibold text-muted">Employee</label>
+                                                <p>{{ $employee->first_name ?? '' }} {{ $employee->last_name ?? '' }}</p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="fw-semibold text-muted">Position</label>
+                                                <p>{{ $position->position_name ?? 'N/A' }}</p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="fw-semibold text-muted">Pay Period</label>
+                                                <p>{{ $payroll->pay_period_start }} - {{ $payroll->pay_period_end }}</p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="fw-semibold text-muted">Basic Salary</label>
+                                                <p>₱{{ number_format($payroll->basic_salary ?? 0, 2) }}</p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="fw-semibold text-muted">Overtime Pay</label>
+                                                <p>₱{{ number_format($payroll->overtime_pay ?? 0, 2) }}</p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="fw-semibold text-muted">Deductions</label>
+                                                <p>₱{{ number_format($payroll->deductions ?? 0, 2) }}</p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="fw-semibold text-muted">Net Pay</label>
+                                                <p class="fw-bold text-success">₱{{ number_format($payroll->net_pay ?? 0, 2) }}</p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="fw-semibold text-muted">Payment Date</label>
+                                                <p>{{ $payroll->payment_date ?? 'N/A' }}</p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="modal-footer border-0">
-                                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Close</button>
+                                    <div class="modal-footer border-0">
+                                        <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Close</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                @empty
-                    <tr>
-                        <td colspan="9" class="text-center text-muted py-4">No payroll records found.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+
+                    @empty
+                        <tr>
+                            <td colspan="9" class="text-center text-muted py-4">No payroll records found.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
 
     {{-- Pagination --}}
@@ -219,4 +232,21 @@
     </div>
 
 </div>
+
+{{-- Optional inline styles for nicer horizontal scrollbar --}}
+<style>
+    div[style*="overflow-x: auto"]::-webkit-scrollbar {
+        height: 8px;
+    }
+    div[style*="overflow-x: auto"]::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    div[style*="overflow-x: auto"]::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+    }
+    div[style*="overflow-x: auto"]::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+</style>
 @endsection
