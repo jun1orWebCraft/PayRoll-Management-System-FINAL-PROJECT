@@ -18,7 +18,10 @@
 
     {{-- Success Message --}}
     @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+        <div class="alert alert-success alert-dismissible fade show">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
     @endif
 
     {{-- Deductions Table --}}
@@ -27,9 +30,9 @@
             <thead class="table-primary">
                 <tr>
                     <th>Employee Name</th>
-                    <th>SSS (5%)</th>
-                    <th>PhilHealth (2.5%)</th>
-                    <th>Pag-IBIG (₱100)</th>
+                    <th>SSS</th>
+                    <th>PhilHealth</th>
+                    <th>Pag-IBIG</th>
                     <th>Withholding Tax</th>
                     <th>Total Deduction</th>
                     <th>Date</th>
@@ -38,20 +41,23 @@
             </thead>
             <tbody>
                 @forelse($deductions as $deduction)
+                    @php
+                        $employee = $deduction->employee;
+                        $total = $deduction->sss + $deduction->philhealth + $deduction->pagibig + $deduction->withholding_tax;
+                    @endphp
                     <tr>
-                        <td class="fw-semibold">{{ $deduction->employee->first_name }} {{ $deduction->employee->last_name }}</td>
+                        <td class="fw-semibold">{{ $employee->first_name }} {{ $employee->last_name }}</td>
                         <td>₱{{ number_format($deduction->sss, 2) }}</td>
                         <td>₱{{ number_format($deduction->philhealth, 2) }}</td>
                         <td>₱{{ number_format($deduction->pagibig, 2) }}</td>
                         <td>₱{{ number_format($deduction->withholding_tax, 2) }}</td>
-                        <td><strong>₱{{ number_format($deduction->total_deduction, 2) }}</strong></td>
+                        <td><strong>₱{{ number_format($total, 2) }}</strong></td>
                         <td>{{ \Carbon\Carbon::parse($deduction->deduction_date)->format('M d, Y') }}</td>
                         <td>
                             <form action="{{ route('deductions.destroy', $deduction->id) }}" method="POST" class="d-inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-link text-danger p-0"
-                                        onclick="return confirm('Delete this deduction?')">
+                                <button type="submit" class="btn btn-link text-danger p-0" onclick="return confirm('Delete this deduction?')">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </form>
@@ -78,7 +84,7 @@
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label class="form-label">Employee</label>
+                            <label class="form-label fw-semibold">Employee</label>
                             <select name="employee_id" class="form-select" required>
                                 <option value="">Select Employee</option>
                                 @foreach($employees as $emp)
@@ -86,9 +92,30 @@
                                 @endforeach
                             </select>
                         </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Select Deductions to Apply</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="1" name="sss" id="deductionSSS" checked>
+                                <label class="form-check-label" for="deductionSSS">SSS (5%)</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="1" name="philhealth" id="deductionPhilHealth" checked>
+                                <label class="form-check-label" for="deductionPhilHealth">PhilHealth (2.5%)</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="1" name="pagibig" id="deductionPagIbig" checked>
+                                <label class="form-check-label" for="deductionPagIbig">Pag-IBIG (₱100)</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="1" name="withholding_tax" id="deductionTax" checked>
+                                <label class="form-check-label" for="deductionTax">Withholding Tax</label>
+                            </div>
+                        </div>
                     </div>
+
                     <div class="modal-footer border-0">
-                        <button type="submit" class="btn btn-primary px-4">Compute Now</button>
+                        <button type="submit" class="btn btn-primary px-4">Compute & Save</button>
                         <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancel</button>
                     </div>
                 </form>

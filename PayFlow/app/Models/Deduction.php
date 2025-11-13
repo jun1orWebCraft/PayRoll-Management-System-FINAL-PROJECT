@@ -9,14 +9,16 @@ class Deduction extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'deduction_id'; // matches migration
+    protected $primaryKey = 'id'; // default, matches your current migration
 
     protected $fillable = [
         'employee_id',
-        'deduction_name',
-        'amount',
+        'sss',
+        'philhealth',
+        'pagibig',
+        'withholding_tax',
+        'total_deduction',
         'deduction_date',
-        'remarks',
     ];
 
     // Relationship: Deduction belongs to an Employee

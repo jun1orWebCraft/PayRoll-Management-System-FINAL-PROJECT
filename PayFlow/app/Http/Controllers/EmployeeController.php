@@ -448,4 +448,9 @@ class EmployeeController extends Controller
         return $pdf->download($fileName);
     }
 
+    public function payrolls()
+    {
+        return $this->hasMany(Payroll::class, 'employee_id');
+    }
+
 }
