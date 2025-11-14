@@ -125,11 +125,11 @@ class PayFlowController extends Controller
     public function reports()
     {
         $positions = Position::withCount('employees')->get();
-        $labels = $positions->pluck('position_name');
-        $data = $positions->pluck('employees_count');
+        $labels = $positions->pluck('position_name');    
+        $data = $positions->pluck('employees_count');    
 
-        $startOfWeek = Carbon::now()->startOfWeek();
-        $endOfWeek = Carbon::now()->endOfWeek();
+        $startOfWeek = Carbon::now()->startOfWeek();  
+        $endOfWeek = Carbon::now()->endOfWeek();      
 
         $weekDays = collect();
         for ($i = 0; $i < 7; $i++) {
@@ -138,7 +138,7 @@ class PayFlowController extends Controller
         }
 
         $attendanceData = Attendance::selectRaw('DATE(date) as day, COUNT(*) as total')
-            ->whereBetween('date', [$startOfWeek, $endOfWeek])
+            ->whereBetween('date', [$startOfWeek->toDateString(), $endOfWeek->toDateString()])
             ->where('status', 'Present')
             ->groupBy('day')
             ->orderBy('day', 'asc')
@@ -149,15 +149,15 @@ class PayFlowController extends Controller
             $weekDays[$dayAbbrev] = $record->total;
         }
 
-        $attendanceLabels = $weekDays->keys();
-        $attendanceCounts = $weekDays->values();
+        $attendanceLabels = $weekDays->keys();    
+        $attendanceCounts = $weekDays->values();  
 
         $totalEmployees = Employee::count();
-        $totalAttendance = Attendance::whereBetween('date', [$startOfWeek, $endOfWeek])
+        $totalAttendance = Attendance::whereBetween('date', [$startOfWeek->toDateString(), $endOfWeek->toDateString()])
             ->where('status', 'Present')
             ->count();
 
-        $expectedAttendance = $totalEmployees * 7;
+        $expectedAttendance = $totalEmployees * 7; 
         $averageAttendanceRate = $expectedAttendance > 0
             ? round(($totalAttendance / $expectedAttendance) * 100, 2)
             : 0;

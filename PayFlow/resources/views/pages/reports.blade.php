@@ -127,24 +127,19 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    // Weekly Attendance (Bar Chart)
-    const attendanceCtx = document.getElementById('weeklyAttendanceChart').getContext('2d');
-    new Chart(attendanceCtx, {
+    const attendanceLabels = @json($attendanceLabels);
+    const attendanceCounts = @json($attendanceCounts);
+
+    const ctx = document.getElementById('weeklyAttendanceChart').getContext('2d');
+    new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['Juan Dela Cruz', 'Maria Santos', 'Jose Ramos', 'Ana Cruz'],
+            labels: attendanceLabels,
             datasets: [{
                 label: 'Days Present',
-                data: [5, 4, 3, 5],
+                data: attendanceCounts,
                 backgroundColor: '#4e73df',
-                borderRadius: 6,
-                maxBarThickness: 40
-            }, {
-                label: 'Days Absent',
-                data: [0, 1, 2, 0],
-                backgroundColor: '#e74a3b',
-                borderRadius: 6,
-                maxBarThickness: 40
+                borderRadius: 6
             }]
         },
         options: {

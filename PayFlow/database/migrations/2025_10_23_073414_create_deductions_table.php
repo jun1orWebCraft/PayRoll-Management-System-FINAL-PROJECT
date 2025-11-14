@@ -10,7 +10,8 @@ return new class extends Migration
     {
         Schema::create('deductions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('employee_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('employee_id');
+            $table->foreign('employee_id')->references('employee_id')->on('employees')->onDelete('cascade');
             $table->decimal('sss', 10, 2)->nullable();          
             $table->decimal('philhealth', 10, 2)->nullable();
             $table->decimal('pagibig', 10, 2)->nullable();

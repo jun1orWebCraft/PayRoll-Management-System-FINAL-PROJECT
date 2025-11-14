@@ -96,9 +96,13 @@
                             </td>
                             <td style="white-space: nowrap;">
                                 {{-- Edit Button --}}
-                                <a href="{{ route('accountant.payrollprocessing.edit', $payroll->payroll_id) }}" class="btn btn-link text-warning p-0 me-2" title="Edit Payroll">
+                                <button class="btn btn-link text-warning p-0 me-2" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#editPayrollModal{{ $payroll->payroll_id }}" 
+                                        title="Edit Payroll">
                                     <i class="bi bi-pencil-square fs-5"></i>
-                                </a>
+                                </button>
+
 
                                 {{-- View Button --}}
                                 <button class="btn btn-link text-primary p-0 me-2"
@@ -118,6 +122,58 @@
                                 </form>
                             </td>
                         </tr>
+                        {{-- Edit Payroll Modal --}}
+                        <div class="modal fade" id="editPayrollModal{{ $payroll->payroll_id }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
+                                <div class="modal-content border-0 rounded-4 shadow-lg">
+                                    <div class="modal-header bg-warning text-dark border-0">
+                                        <h5 class="modal-title fw-semibold">Edit Payroll</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <form action="{{ route('accountant.payrollprocessing.update', $payroll->payroll_id) }}" method="POST">
+                                        @csrf
+                                        @method('PUT')
+                                        <div class="modal-body">
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label fw-semibold">Employee</label>
+                                                    <select name="employee_id" class="form-select" required>
+                                                        @foreach($employees as $emp)
+                                                            <option value="{{ $emp->employee_id }}" 
+                                                                {{ $emp->employee_id == $payroll->employee_id ? 'selected' : '' }}>
+                                                                {{ $emp->first_name }} {{ $emp->last_name }} - {{ $emp->position->position_name ?? 'N/A' }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label class="form-label fw-semibold">Pay Period Start</label>
+                                                    <input type="date" name="pay_period_start" class="form-control"
+                                                        value="{{ $payroll->pay_period_start }}" required>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label class="form-label fw-semibold">Pay Period End</label>
+                                                    <input type="date" name="pay_period_end" class="form-control"
+                                                        value="{{ $payroll->pay_period_end }}" required>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label class="form-label fw-semibold">Overtime Hours</label>
+                                                    <input type="number" step="0.01" name="overtime_hours" class="form-control"
+                                                        value="{{ $payroll->basic_salary > 0 ? ($payroll->overtime_pay / (($payroll->basic_salary / 22) / 8)) : 0 }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer border-0">
+                                            <button type="submit" class="btn btn-warning px-4">Update Payroll</button>
+                                            <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancel</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
 
                         {{-- View Payroll Modal --}}
                         <div class="modal fade" id="viewPayrollModal{{ $payroll->payroll_id }}" tabindex="-1" aria-hidden="true">
