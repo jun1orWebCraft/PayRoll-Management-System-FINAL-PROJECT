@@ -131,11 +131,62 @@
                 <h6 class="fw-bold mb-3">Quick Actions</h6>
                 <div class="d-flex gap-2">
                     <a href="#" class="btn btn-outline-success flex-fill" data-bs-toggle="modal" data-bs-target="#editProfileModal">Edit Profile</a>
+                    <a href="#" class="btn btn-outline-secondary flex-fill" data-bs-toggle="modal" data-bs-target="#downloadIDModal">Download ID</a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<!-- Download ID Modal -->
+<div class="modal fade" id="downloadIDModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Employee ID Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <!-- The ID Card (This will be downloaded as image) -->
+                <div id="idCard" class="p-3 mx-auto" 
+                     style="width: 300px; background: white; border: 2px solid #ddd; border-radius: 10px;">
+
+                    <div class="text-center">
+                        <img src="{{ $employee->profile_picture && file_exists(storage_path('app/public/' . $employee->profile_picture)) 
+                                    ? asset('storage/' . $employee->profile_picture) 
+                                    : asset('images/default-profile.png') }}"
+                             class="rounded-circle mb-3"
+                             style="width: 100px; height: 100px; border: 3px solid #0d6efd;">
+                        
+                        <h4 class="fw-bold mb-0">{{ $employee->full_name }}</h4>
+                        <p class="text-muted mb-1">{{ $employee->position ? $employee->position->name : '-' }}</p>
+
+                        <span><p class="fw-semibold mb-0">{{ $employee->position->position_name ?? '-' }}</p></span>
+                    </div>
+
+                    <hr>
+
+                    <div class="text-center">
+                        @if($employee->QR_code)
+                            <img src="{{ $employee->QR_code }}" style="width: 140px; height: 140px;">
+                        @else
+                            <p>No QR code</p>
+                        @endif
+                    </div>
+                </div>
+                <!-- END ID CARD -->
+
+            </div>
+
+            <div class="modal-footer d-flex justify-content-between">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn btn-primary" id="downloadIDBtn">Download</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <!-- Edit Profile Modal -->
 <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
@@ -192,8 +243,18 @@
   </div>
 </div>
 
-<!-- JS: Preview Profile Picture -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
+document.getElementById('downloadIDBtn').addEventListener('click', function () {
+    const card = document.getElementById('idCard');
+
+    html2canvas(card).then(canvas => {
+        const link = document.createElement('a');
+        link.download = "Employee-ID-{{ $employee->employee_no }}.png";
+        link.href = canvas.toDataURL();
+        link.click();
+    });
+});
 function previewImage(event) {
     const input = event.target;
     const reader = new FileReader();
