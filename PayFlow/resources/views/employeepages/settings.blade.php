@@ -10,23 +10,28 @@
         <span class="fw-medium" id="currentDateTime">Nov 6, 2025 10:00 AM</span>
     </div>
 </div>
+            @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
 
-    {{-- Notification Preferences --}}
-    <div class="card mb-4">
-        <div class="card-body">
-            <h5 class="card-title fw-bold">Notification Preferences</h5>
-            <p class="text-muted">Email Notifications</p>
-
-            @if($errors->any())
+            @if ($errors->any())
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     <ul class="mb-0">
-                        @foreach($errors->all() as $error)
+                        @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
+    {{-- Notification Preferences --}}
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title fw-bold">Notification Preferences</h5>
+            <p class="text-muted">Email Notifications</p>
 
             {{-- 🔒 Notification Preferences Form --}}
             <form method="POST" action="{{ route('notification.preferences.update') }}">
@@ -85,24 +90,6 @@
     <div class="card mb-4">
         <div class="card-body">
             <h5 class="card-title fw-bold">Change Password</h5>
-            @if (session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
-
-            @if ($errors->any())
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
-
             <form method="POST" action="{{ route('employee.changePassword') }}">
                 @csrf
                 @method('PUT')

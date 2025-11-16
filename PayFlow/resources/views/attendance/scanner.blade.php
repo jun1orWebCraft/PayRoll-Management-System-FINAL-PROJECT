@@ -12,8 +12,8 @@
 </head>
 <body>
 <div class="container text-center py-5">
-    <h2 class="fw-bold mb-3">QR / Barcode Attendance Scanner</h2>
-    <p class="text-muted">Scan your QR or barcode — attendance will be recorded automatically.</p>
+    <h2 class="fw-bold mb-3">QR Attendance Scanner</h2>
+    <p class="text-muted">Scan your QR — attendance will be recorded automatically.</p>
 
     <div id="reader" style="width: 350px; margin: 0 auto;"></div>
     <div id="status" class="mt-4 fs-5 fw-semibold text-muted">Ready for scan...</div>
