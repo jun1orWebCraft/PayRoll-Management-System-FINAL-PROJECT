@@ -14,7 +14,7 @@
           <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
               <h6 class="text-muted mb-1">Total Outstanding</h6>
-              <h3 class="fw-bold mb-0">${{ number_format($totalOutstanding, 2) }}</h3>
+              <h3 class="fw-bold mb-0">₱{{ number_format($totalOutstanding, 2) }}</h3>
             </div>
             <div>
               <div class="btn-group">
@@ -52,15 +52,15 @@
           <div class="row text-center mb-3">
             <div class="col">
               <p class="text-muted small mb-1">Payment</p>
-              <h6 class="fw-semibold mb-0">${{ number_format($totalPayment, 2) }}</h6>
+              <h6 class="fw-semibold mb-0">₱{{ number_format($totalPayment, 2) }}</h6>
             </div>
             <div class="col">
               <p class="text-muted small mb-1">Pending</p>
-              <h6 class="fw-semibold mb-0">${{ number_format($totalPending, 2) }}</h6>
+              <h6 class="fw-semibold mb-0">₱{{ number_format($totalPending, 2) }}</h6>
             </div>
             <div class="col">
               <p class="text-muted small mb-1">Paid</p>
-              <h6 class="fw-semibold mb-0">${{ number_format($totalPayment, 2) }}</h6>
+              <h6 class="fw-semibold mb-0">₱{{ number_format($totalPayment, 2) }}</h6>
             </div>
           </div>
 
@@ -127,7 +127,7 @@
                 <h6 class="fw-semibold mb-0">Previous Payroll</h6>
                 <span class="badge bg-success bg-opacity-10 text-success fw-semibold px-3 py-2">PAID</span>
               </div>
-              <h4 class="fw-bold mb-0">${{ number_format($previousPayroll->net_pay, 2) }}</h4>
+              <h4 class="fw-bold mb-0">₱{{ number_format($previousPayroll->net_pay, 2) }}</h4>
               <small class="text-muted">{{ $previousPayroll->payment_date }}</small>
             </div>
           </div>
@@ -141,7 +141,7 @@
                 <h6 class="fw-semibold mb-0">Upcoming Payroll</h6>
                 <span class="badge bg-warning bg-opacity-10 text-warning fw-semibold px-3 py-2">PENDING</span>
               </div>
-              <h4 class="fw-bold mb-0">${{ number_format($upcomingPayroll->net_pay, 2) }}</h4>
+              <h4 class="fw-bold mb-0">₱{{ number_format($upcomingPayroll->net_pay, 2) }}</h4>
               <small class="text-muted">{{ $upcomingPayroll->payment_date }}</small>
               <hr>
               <div class="d-flex justify-content-between align-items-center">
