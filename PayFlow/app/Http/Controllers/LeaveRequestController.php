@@ -9,6 +9,7 @@ use Illuminate\Validation\Rule;
 use Carbon\Carbon;
 use App\Models\Attendance;
 use App\Models\Notification;
+use App\Models\ActivityLog;
 
 class LeaveRequestController extends Controller
 {

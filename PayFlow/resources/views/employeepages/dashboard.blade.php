@@ -76,7 +76,7 @@
 
         <div class="col-md-3">
             <div class="card shadow-sm border-0 rounded-4 p-3">
-                <h6 class="text-muted"><i class="bi bi-currency-dollar me-2"></i>Current Month Net</h6>
+                <h6 class="text-muted"><i class="bi  me-2"></i>₱ Current Month Net</h6>
                 <h4 class="fw-bold text-primary">₱{{ number_format($currentMonthPayroll, 2) }}</h4>
                 @if($currentMonthPaymentDate)
                     <small>Pay Date: {{ Carbon::parse($currentMonthPaymentDate)->format('m/d/Y') }}</small>
