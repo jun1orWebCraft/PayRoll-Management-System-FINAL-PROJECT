@@ -19,9 +19,9 @@ class PayFlowController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->name === 'Accountant') {
+        if ($user->role === 'Accountant') {
             return view('accountant.dashboard', compact('user'));
-        } elseif ($user->name === 'HR') {
+        } elseif ($user->role === 'HR') {
             $today = Carbon::today();
 
             $endedLeaves = LeaveRequest::where('status', 'Approved')

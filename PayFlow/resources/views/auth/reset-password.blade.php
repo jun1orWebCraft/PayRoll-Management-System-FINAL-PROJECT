@@ -1,55 +1,152 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Reset Password — PayFlow</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --accent-color: #34d399;
+            --dark-bg: #0b1220;
+            --muted-color: #6b7280;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #1f2a44, #0b1220);
+        }
+
+        .reset-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            padding: 40px 35px;
+            max-width: 480px;
+            width: 100%;
+            color: white;
+            box-shadow: 0 12px 25px rgba(0,0,0,0.45);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .reset-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 35px rgba(0,0,0,0.55);
+        }
+
+        .reset-card h4 {
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #ffffff;
+        }
+
+        label {
+            color: #e5e7eb;
+            font-weight: 500;
+        }
+
+        .form-control {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.2rem rgba(52, 211, 153, 0.25);
+            color: white;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            border: none;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #2fb98a;
+            transform: translateY(-2px);
+        }
+
+        .alert-success, .alert-danger {
+            border-radius: 8px;
+        }
+
+        .text-center a {
+            color: var(--accent-color);
+            font-weight: 500;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .text-center a:hover {
+            color: #2fb98a;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .reset-card {
+                padding: 30px 25px;
+            }
+        }
+    </style>
 </head>
-<body class="bg-light">
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-5">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h4 class="mb-3">Reset Password</h4>
+<body>
 
-                    @php
-                        $email = $email ?? request('email') ?? old('email') ?? '';
-                    @endphp
+<div class="reset-card">
+    <h4>Reset Password</h4>
 
-                    <form method="POST" action="{{ route('password.update') }}">
-                        @csrf
-                        <input type="hidden" name="token" value="{{ $token }}">
-                        <input type="hidden" name="email" value="{{ $email }}">
-                        
-                        <div class="form-group">
-                            <label>Email</label>
-                            <input type="email" name="email" value="{{ old('email', $email) }}" required autofocus class="form-control">
-                        </div>
+    @php
+        $email = $email ?? request('email') ?? old('email') ?? '';
+    @endphp
 
-                        <div class="form-group">
-                            <label>New Password</label>
-                            <input type="password" name="password" required class="form-control">
-                        </div>
+    <form method="POST" action="{{ route('password.update') }}">
+        @csrf
+        <input type="hidden" name="token" value="{{ $token }}">
+        <input type="hidden" name="email" value="{{ $email }}">
 
-                        <div class="form-group">
-                            <label>Confirm Password</label>
-                            <input type="password" name="password_confirmation" required class="form-control">
-                        </div>
-
-                        <button type="submit" class="btn btn-primary w-100 mt-3">
-                            Reset Password
-                        </button>
-                    </form>
-
-
-                    <div class="mt-3">
-                        <a href="{{ route('login') }}">Back to login</a>
-                    </div>
-                </div>
-            </div>
+        <div class="mb-3">
+            <label>Email</label>
+            <input type="email" name="email" value="{{ old('email', $email) }}" required autofocus class="form-control" placeholder="john@example.com">
+            @error('email') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
         </div>
+
+        <div class="mb-3">
+            <label>New Password</label>
+            <input type="password" name="password" required class="form-control" placeholder="••••••••">
+            @error('password') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+        </div>
+
+        <div class="mb-4">
+            <label>Confirm Password</label>
+            <input type="password" name="password_confirmation" required class="form-control" placeholder="••••••••">
+        </div>
+
+        <div class="d-grid mb-3">
+            <button type="submit" class="btn btn-primary btn-lg">Reset Password</button>
+        </div>
+    </form>
+
+    <div class="text-center mt-2">
+        <a href="{{ route('login') }}">Back to login</a>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

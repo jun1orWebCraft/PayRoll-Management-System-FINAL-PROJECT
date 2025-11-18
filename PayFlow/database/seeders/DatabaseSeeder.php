@@ -24,9 +24,10 @@ class DatabaseSeeder extends Seeder
         User::firstOrCreate(
             ['email' => 'iandolorito16@gmail.com'],
             [
-                'name' => 'HR',
+                'name' => 'IDSC',
                 'password' => Hash::make('iandolorito'),
                 'email_verified_at' => now(),
+                'role' => 'HR',
             ]
         );
  
@@ -34,9 +35,10 @@ class DatabaseSeeder extends Seeder
         User::firstOrCreate(
             ['email' => 'accountant@gmail.com'],
             [
-                'name' => 'Accountant',
+                'name' => 'IDSC Accountant',
                 'password' => Hash::make('accountant123'),
                 'email_verified_at' => now(),
+                'role' => 'Accountant',
             ]
         );
        
