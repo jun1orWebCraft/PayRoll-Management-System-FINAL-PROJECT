@@ -139,6 +139,11 @@ class LeaveRequestController extends Controller
                 $employee->status = 'On Leave';
                 $employee->save();
             }
+            ActivityLog::create([
+                'action' => "Leave approved for {$employee->first_name} {$employee->last_name} ({$leave->start_date} to {$leave->end_date})",
+                'icon' => 'bi-check-circle',
+                'color' => 'text-success',
+            ]);
 
             while ($start->lte($end)) {
                 Attendance::updateOrCreate(
@@ -174,7 +179,11 @@ class LeaveRequestController extends Controller
         $leave->status = 'Rejected';
         $leave->approved_by = auth()->id();
         $leave->save();
-
+        ActivityLog::create([
+            'action' => "Leave rejected for {$employee->first_name} {$employee->last_name} ({$leave->start_date} to {$leave->end_date})",
+            'icon' => 'bi-check-circle',
+            'color' => 'text-danger',
+        ]);
         if ($leave->employee) {
             $employee = $leave->employee;
 
