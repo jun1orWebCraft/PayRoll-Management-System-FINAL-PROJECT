@@ -107,13 +107,28 @@ class PayFlowController extends Controller
         $totalPayment = $payrolls->where('status', 'Paid')->sum('net_pay');
         $totalPending = $payrolls->where('status', 'Pending')->sum('net_pay');
 
+        $thisMonthTotal = Payroll::whereYear('payment_date', now()->year)
+        ->whereMonth('payment_date', now()->month)
+        ->sum('net_pay');
+
+        $lastMonth = now()->subMonth();
+        $lastMonthTotal = Payroll::whereYear('payment_date', $lastMonth->year)
+            ->whereMonth('payment_date', $lastMonth->month)
+            ->sum('net_pay');
+
+        if ($lastMonthTotal > 0) {
+            $percentageChange = (($thisMonthTotal - $lastMonthTotal) / $lastMonthTotal) * 100;
+        } else {
+            $percentageChange = 0;
+        }
         return view('pages.payrolldata', compact(
             'payrolls',
             'previousPayroll',
             'upcomingPayroll',
             'totalOutstanding',
             'totalPayment',
-            'totalPending'
+            'totalPending',
+            'percentageChange'
         ));
     }
 
