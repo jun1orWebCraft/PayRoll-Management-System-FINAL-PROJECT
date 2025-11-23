@@ -8,7 +8,7 @@
         <h3 class="fw-bold mb-0">Dashboard</h3>
 
         <!-- Current Date & Time -->
-        <div class="d-flex align-items-center justify-content-end gap-2 px-3 py-1 rounded-3 bg-light shadow-sm">
+        <div class="d-flex align-items-center justify-content-end gap-2 px-3 py-1 rounded-3 bg-bold shadow-sm">
             <i class="bi bi-clock fs-5 text-secondary"></i>
             <span class="fw-medium" id="currentDateTime"></span>
         </div>
@@ -54,54 +54,39 @@
     </div>
     <!-- TOP CARDS -->
     <div class="row g-3 mb-4">
-        @php
-            use Carbon\Carbon;
-
-            $currentMonthStart = Carbon::now()->startOfMonth();
-            $currentMonthEnd = Carbon::now()->endOfMonth();
-
-            $currentMonthPayroll = \App\Models\Payroll::whereBetween('payment_date', [$currentMonthStart, $currentMonthEnd])
-                ->where('status', 'Paid')
-                ->sum('net_pay');
-
-            $currentMonthPaymentDate = \App\Models\Payroll::whereBetween('payment_date', [$currentMonthStart, $currentMonthEnd])
-                ->where('status', 'Paid')
-                ->latest('payment_date')
-                ->value('payment_date');
-
-            $ytdPayroll = \App\Models\Payroll::whereYear('payment_date', Carbon::now()->year)
-                ->where('status', 'Paid')
-                ->sum('net_pay');
-        @endphp
-
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 rounded-4 p-3">
-                <h6 class="text-muted"><i class="bi  me-2"></i>₱ Current Month Net</h6>
-                <h4 class="fw-bold text-primary">₱{{ number_format($currentMonthPayroll, 2) }}</h4>
-                @if($currentMonthPaymentDate)
-                    <small>Pay Date: {{ Carbon::parse($currentMonthPaymentDate)->format('m/d/Y') }}</small>
-                @else
-                    <small>No payments yet</small>
-                @endif
+        <div class="col-md-6 d-flex">
+            <div class="card shadow-sm border-0 rounded-4 p-4 w-100 h-100 d-flex flex-column justify-content-between">
+                <h5 class="fw-bold mb-3">Attendance Summary - This Month</h5>
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <h4 class="fw-bold text-primary">{{ $presentDays }}</h4>
+                        <p class="text-muted small mb-0">Days Present</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h4 class="fw-bold text-danger">{{ $absentDays }}</h4>
+                        <p class="text-muted small mb-0">Days Absent</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h4 class="fw-bold text-success">{{ round($totalHoursWorked) }}</h4>
+                        <p class="text-muted small mb-0">Hours Worked</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h4 class="fw-bold text-info">{{ round($totalOvertime) }}</h4>
+                        <p class="text-muted small mb-0">Overtime Hours</p>
+                    </div>
+                </div>
             </div>
         </div>
-
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 rounded-4 p-3">
-                <h6 class="text-muted"><i class="bi bi-graph-up-arrow me-2"></i>YTD Earnings</h6>
-                <h4 class="fw-bold text-success">₱{{ number_format($ytdPayroll, 2) }}</h4>
-                <small>Year to date</small>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 rounded-4 p-3">
+        <div class="col-md-3 d-flex">
+            <div class="card shadow-sm border-0 rounded-4 p-3 w-100 h-100 d-flex flex-column justify-content-between">
                 <h6 class="text-muted"><i class="bi bi-calendar3 me-2"></i>Leave Balance</h6>
-                <h4 class="fw-bold text-purple"> {{ $latestLeaveRemaining }} days</h4>
+                <h4 class="fw-bold text-purple">{{ $latestLeaveRemaining }} days</h4>
                 <small>{{ $latestLeaveType }} remaining</small>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 rounded-4 p-3">
+
+        <div class="col-md-3 d-flex">
+            <div class="card shadow-sm border-0 rounded-4 p-3 w-100 h-100 d-flex flex-column justify-content-between">
                 <h6 class="text-muted"><i class="bi bi-check2-circle me-2"></i>Attendance Rate</h6>
                 <h4 class="fw-bold text-info">{{ $attendanceRate }}%</h4>
                 <small>This month</small>
@@ -109,12 +94,13 @@
         </div>
     </div>
 
+
     <div class="row g-4">
         <!-- LEFT SIDE -->
         <div class="col-lg-8">
             <!-- PAY PERIOD -->
             @php
-
+            use Carbon\Carbon;
             use App\Models\Payroll;
 
             // Get the logged-in employee
@@ -218,26 +204,56 @@
                 
             </div>
 
-            <!-- ATTENDANCE SUMMARY -->
-            <div class="card shadow-sm border-0 rounded-4 p-4">
-                <h5 class="fw-bold mb-3">Attendance Summary - This Month</h5>
-                <div class="row text-center">
-                    <div class="col-md-3">
-                        <h4 class="fw-bold text-primary">{{ $presentDays }}</h4>
-                        <p class="text-muted small mb-0">Days Present</p>
-                    </div>
-                    <div class="col-md-3">
-                        <h4 class="fw-bold text-danger">{{ $absentDays }}</h4>
-                        <p class="text-muted small mb-0">Days Absent</p>
-                    </div>
-                    <div class="col-md-3">
-                        <h4 class="fw-bold text-success">{{ round($totalHoursWorked) }}</h4>
-                        <p class="text-muted small mb-0">Hours Worked</p>
-                    </div>
-                    <div class="col-md-3">
-                        <h4 class="fw-bold text-info">{{ round($overtimeHours) }}</h4>
-                        <p class="text-muted small mb-0">Overtime Hours</p>
-                    </div>
+
+            <div class="card shadow-sm border-0 rounded-4 p-4" style="height: 330px;">
+                <h5 class="fw-bold mb-3">Attendance Log</h5>
+
+                <!-- Search Bar -->
+                <div class="mb-3">
+                    <input type="text" id="attendanceSearch" class="form-control form-control-sm" placeholder="Search by date or status...">
+                </div>
+
+                <div class="table-responsive" style="max-height: 310px; overflow-y: auto;">
+                    <table class="table mb-0 text-center align-middle" style="border-collapse: separate; border-spacing: 0 0.5rem;">
+                        <thead>
+                            <tr class="text-muted">
+                                <th class="fw-bold">Date</th>
+                                <th class="fw-bold">Time In</th>
+                                <th class="fw-bold">Time Out</th>
+                                <th class="fw-bold">Total Hours</th>
+                                <th class="fw-bold">Overtime</th>
+                                <th class="fw-bold">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceTable">
+                            @forelse($attendancelogs as $attendance)
+                                <tr class="bg-white shadow-sm rounded-3">
+                                    <td>{{ \Carbon\Carbon::parse($attendance->date)->format('M d, Y') }}</td>
+                                    <td>{{ $attendance->time_in ?? '-' }}</td>
+                                    <td>{{ $attendance->time_out ?? '-' }}</td>
+                                    <td>{{ $attendance->total_hours ?? '0.00' }}</td>
+                                    <td>{{ $attendance->over_time ?? '0.00' }}</td>
+                                    <td>
+                                        @php
+                                            $statusClass = match($attendance->status) {
+                                                'Present' => 'text-success',
+                                                'Late' => 'text-warning',
+                                                'Absent' => 'text-danger',
+                                                'On Leave' => 'text-primary',
+                                                'Working' => 'text-info',
+                                                default => 'text-secondary',
+                                            };
+                                        @endphp
+                                        <span class="{{ $statusClass }} fw-bold">{{ $attendance->status }}</span>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="text-muted">No attendance records found.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -272,7 +288,7 @@
 
                 <div class="overflow-auto" style="max-height: 340px;">
                     @forelse($leaveRequests as $leave)
-                        <div class="mb-3 p-3 rounded bg-light d-flex justify-content-between align-items-start">
+                        <div class="mb-3 p-3 rounded bg-bold d-flex justify-content-between align-items-start">
                             <div>
                                 <h6 class="fw-semibold mb-1">{{ $leave->leave_type }}</h6>
                                 <small class="text-muted">
@@ -320,6 +336,16 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 });
+const searchInput = document.getElementById('attendanceSearch');
+    const tableRows = document.querySelectorAll('#attendanceTable tr');
+
+    searchInput.addEventListener('input', function() {
+        const filter = this.value.toLowerCase();
+        tableRows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            row.style.display = text.includes(filter) ? '' : 'none';
+        });
+    });
 </script>
 
 @endsection

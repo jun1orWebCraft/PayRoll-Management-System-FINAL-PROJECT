@@ -12,7 +12,7 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\NotificationPreferenceController;
-
+use App\Http\Controllers\EmployeeScheduleController;
 Route::middleware('web')->group(function () {
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
@@ -33,8 +33,7 @@ Route::middleware('web')->group(function () {
     
     Route::post('reset-password', [NewPasswordController::class, 'store'])->name('password.update');
 
-    Route::get('/attendance-scanner', [AttendanceController::class, 'scanner'])->name('attendance.scanner');
-    Route::post('/attendance-scanner/store', [AttendanceController::class, 'storeScanner'])->name('attendance.scanner.store');
+    
     
     Route::middleware('auth')->group(function () {
         Route::get('/', [PayFlowController::class, 'dashboard'])->name('dashboard'); 
@@ -43,13 +42,17 @@ Route::middleware('web')->group(function () {
         Route::get('/payrolldata', [PayFlowController::class, 'payrolldata'])->name('payrolldata');
         Route::get('/reports', [PayFlowController::class, 'reports'])->name('reports');
         Route::get('/settings', [PayFlowController::class, 'settings'])->name('settings');
+        Route::get('/employeeschedule', [PayFlowController::class, 'employeeschedule'])->name('employeeschedule');
 
         Route::put('/leave-requests/{leave_request_id}/approve', [LeaveRequestController::class, 'approve'])->name('leave.approve');
         Route::put('/leave-requests/{leave_request_id}/reject', [LeaveRequestController::class, 'reject'])->name('leave.reject');
 
         Route::post('/settings/update-password', [PayFlowController::class, 'updatePassword'])->name('hr.update-password');
         Route::resource('employees', EmployeeController::class);
+        Route::resource('employeeschedule', EmployeeScheduleController::class);
         Route::resource('attendance', AttendanceController::class);
+        Route::get('/attendance-scanner', [AttendanceController::class, 'scanner'])->name('attendance.scanner');
+        Route::post('/attendance-scanner/store', [AttendanceController::class, 'storeScanner'])->name('attendance.scanner.store');
     });
 
     Route::middleware(['auth', 'namecheck:Accountant'])->group(function () {

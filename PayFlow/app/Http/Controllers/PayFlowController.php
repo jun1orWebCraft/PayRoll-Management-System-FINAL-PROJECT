@@ -216,4 +216,8 @@ class PayFlowController extends Controller
 
         return back()->with('status', 'Password updated successfully.');
     }
+    public function employeeschedule()
+    {
+        return view('pages.employeeschedule');
+    }
 }

@@ -14,8 +14,9 @@ return new class extends Migration
             $table->date('date');
             $table->time('time_in')->nullable();
             $table->time('time_out')->nullable();
-            $table->decimal('total_hours', 5, 2)->nullable(); // total working hours per day
-            $table->enum('status', ['Present', 'Absent', 'Late', 'On Leave'])->default('Absent');
+            $table->decimal('total_hours', 5, 2)->nullable(); 
+            $table->decimal('over_time', 5, 2)->nullable();
+            $table->enum('status', ['Present', 'Absent', 'Late', 'On Leave', 'Working'])->default('Absent');
             $table->foreign('employee_id')
                   ->references('employee_id')
                   ->on('employees')

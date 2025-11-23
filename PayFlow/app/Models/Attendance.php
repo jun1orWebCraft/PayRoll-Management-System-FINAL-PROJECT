@@ -9,7 +9,7 @@ class Attendance extends Model
 {
     protected $primaryKey = 'attendance_id';
     protected $fillable = [
-        'employee_id', 'date', 'time_in', 'time_out', 'total_hours', 'status'
+        'employee_id', 'date', 'time_in', 'time_out', 'total_hours', 'status', 'over_time'
     ];
 
     // Automatically compute total hours on save

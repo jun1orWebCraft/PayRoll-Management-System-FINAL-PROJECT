@@ -148,6 +148,9 @@ main {
         <a href="{{ route('employees.index') }}" class="nav-link {{ request()->routeIs('employees.*') ? 'active' : '' }}">
           <span class="icon"><i class="bi bi-people-fill"></i></span><span>Employees</span>
         </a>
+        <a href="{{ route('employeeschedule.index') }}" class="nav-link {{ request()->routeIs('employeeschedule.*') ? 'active' : '' }}">
+          <span class="icon"><i class="bi bi-calendar-check-fill"></i></span><span>Scheduling</span>
+        </a>
         <a href="{{ route('attendance.index') }}" class="nav-link {{ request()->routeIs('attendance.*') ? 'active' : '' }}">
           <span class="icon"><i class="bi bi-clock-fill"></i></span><span>Attendance</span>
         </a>

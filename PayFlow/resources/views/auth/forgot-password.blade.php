@@ -146,7 +146,7 @@
             @csrf
             <div class="mb-3 text-start">
                 <label class="form-label">Email</label>
-                <input type="email" name="email" value="{{ old('email') }}" class="form-control" placeholder="john@example.com" required autofocus>
+                <input type="email" name="email" value="{{ old('email') }}" class="form-control" placeholder="example@gmail.com" required autofocus>
                 @error('email') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
             </div>
             <div class="d-grid mb-3">

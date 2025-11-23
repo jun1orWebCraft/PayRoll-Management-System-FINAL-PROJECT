@@ -6,6 +6,7 @@ use App\Models\Attendance;
 use App\Models\Employee;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Models\EmployeeSchedule;
 
 class AttendanceController extends Controller
 {
@@ -61,45 +62,172 @@ class AttendanceController extends Controller
                             ->orWhere('QR_code', $qrData)
                             ->first();
 
-        if (!$employee) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Employee not found.'
-            ]);
+        if (! $employee) {
+            return response()->json(['status' => 'error', 'message' => 'Employee not found.']);
         }
-
-        $todayRecord = Attendance::where('employee_id', $employee->employee_id)
-            ->whereDate('date', Carbon::today())
-            ->first();
 
         $now = Carbon::now('Asia/Manila');
-        $cutoff = Carbon::createFromTime(7, 30, 0, 'Asia/Manila');
+        $today = $now->toDateString();
+        $dayName = strtolower($now->format('l'));
 
-        if (!$todayRecord) {
-            Attendance::create([
-                'employee_id' => $employee->employee_id,
-                'date' => $now->toDateString(),
-                'time_in' => $now,
-                'status' => $now->lessThanOrEqualTo($cutoff) ? 'Present' : 'Late',
-            ]);
-            $message = "Time In recorded for {$employee->first_name} {$employee->last_name}";
-        } elseif (!$todayRecord->time_out) {
-            $timeIn = Carbon::parse($todayRecord->time_in);
-            $totalHours = $timeIn->diffInMinutes($now) / 60;
+        $attendance = Attendance::where('employee_id', $employee->employee_id)
+            ->whereDate('date', $today)
+            ->first();
 
-            $todayRecord->update([
-                'time_out' => $now,
-                'total_hours' => round($totalHours, 2),
-            ]);
-            $message = "Time Out recorded for {$employee->first_name} {$employee->last_name}";
-        } else {
-            $message = "Already timed out today for {$employee->first_name} {$employee->last_name}";
+        $parseSchedule = function (?string $schedStr) use ($today) {
+            $result = [
+                'morning' => null,
+                'afternoon' => null,
+            ];
+
+            if (! $schedStr) return $result;
+
+            $parts = array_map('trim', explode('/', $schedStr));
+            if (count($parts) === 1) $parts[] = '00:00-00:00';
+
+            list($morningStr, $afternoonStr) = $parts;
+
+            $toBlock = function ($blockStr) use ($today) {
+                $blockStr = trim($blockStr);
+                if ($blockStr === '' || $blockStr === '00:00-00:00') return null;
+
+                if (strpos($blockStr, '-') === false) return null;
+                [$s, $e] = array_map('trim', explode('-', $blockStr));
+                try {
+                    $start = Carbon::createFromFormat('Y-m-d H:i', "$today $s", 'Asia/Manila');
+                    $end   = Carbon::createFromFormat('Y-m-d H:i', "$today $e", 'Asia/Manila');
+                } catch (\Exception $ex) {
+                    return null;
+                }
+                return ['start' => $start, 'end' => $end];
+            };
+
+            $result['morning'] = $toBlock($morningStr);
+            $result['afternoon'] = $toBlock($afternoonStr);
+
+            return $result;
+        };
+
+        $overlapMinutes = function (Carbon $aStart, Carbon $aEnd, Carbon $bStart, Carbon $bEnd) {
+            $start = $aStart->greaterThan($bStart) ? $aStart : $bStart;
+            $end   = $aEnd->lessThan($bEnd) ? $aEnd : $bEnd;
+            if ($start->gte($end)) return 0;
+            return $start->diffInMinutes($end);
+        };
+
+        if (!$attendance) {
+            if ($employee->employment_type === 'Full-Time') {
+                $shiftStart = Carbon::createFromFormat('Y-m-d H:i', "$today 07:00", 'Asia/Manila');
+                $status = $now->lte($shiftStart) ? 'Working' : 'Late';
+
+                Attendance::create([
+                    'employee_id' => $employee->employee_id,
+                    'date' => $today,
+                    'time_in' => $now,
+                    'status' => $status,
+                    'total_hours' => null,
+                    'over_time' => 0,
+                ]);
+
+                return response()->json(['status' => 'success', 'message' => "Time In recorded for {$employee->first_name} {$employee->last_name}. Status: {$status}"]);
+            }
+
+            if ($employee->employment_type === 'Part-Time') {
+                $sched = EmployeeSchedule::where('employee_id', $employee->employee_id)->first();
+                $blocks = $parseSchedule($sched ? $sched->{$dayName} : null);
+
+                $morning = $blocks['morning'];
+                $afternoon = $blocks['afternoon'];
+
+                $applicableStart = null;
+
+                if ($morning) {
+                    if ($now->lte($morning['end'])) {
+                        $applicableStart = $morning['start'];
+                    } else {
+                        if ($afternoon) {
+                            $applicableStart = $afternoon['start'];
+                        } else {
+                            $applicableStart = $morning['start'];
+                        }
+                    }
+                } else {
+                    if ($afternoon) {
+                        $applicableStart = $afternoon['start'];
+                    } else {
+                        return response()->json(['status' => 'error', 'message' => 'No schedule assigned for today.']);
+                    }
+                }
+
+                $status = $now->lte($applicableStart) ? 'Working' : 'Late';
+
+                Attendance::create([
+                    'employee_id' => $employee->employee_id,
+                    'date' => $today,
+                    'time_in' => $now,
+                    'status' => $status,
+                    'total_hours' => null,
+                    'over_time' => 0,
+                ]);
+
+                return response()->json(['status' => 'success', 'message' => "Time In recorded for {$employee->first_name} {$employee->last_name}. Status: {$status}"]);
+            }
         }
 
-        return response()->json([
-            'status' => 'success',
-            'message' => $message,
-        ]);
+        if ($attendance && !$attendance->time_out) {
+            $timeIn = Carbon::parse($attendance->time_in)->setTimezone('Asia/Manila');
+
+            if ($employee->employment_type === 'Full-Time') {
+                $regularEnd = Carbon::createFromFormat('Y-m-d H:i', "$today 17:00", 'Asia/Manila');
+                $totalHours = $timeIn->diffInMinutes($now) / 60;
+                $overHours = $now->greaterThan($regularEnd) ? $regularEnd->diffInMinutes($now) / 60 : 0;
+
+                $attendance->update([
+                    'time_out' => $now,
+                    'total_hours' => round($totalHours, 2),
+                    'over_time' => round($overHours, 2),
+                    'status' => 'Present',
+                ]);
+
+                return response()->json(['status' => 'success', 'message' => "Time Out recorded for {$employee->first_name} {$employee->last_name}. Total: ".round($totalHours,2)." hrs, OT: ".round($overHours,2)." hrs"]);
+            }
+
+            if ($employee->employment_type === 'Part-Time') {
+                $sched = EmployeeSchedule::where('employee_id', $employee->employee_id)->first();
+                $blocks = $parseSchedule($sched ? $sched->{$dayName} : null);
+
+                $morning = $blocks['morning'];
+                $afternoon = $blocks['afternoon'];
+
+                if (! $morning && ! $afternoon) {
+                    return response()->json(['status' => 'error', 'message' => 'No schedule assigned for today.']);
+                }
+
+                $minutes = 0;
+
+                if ($morning) {
+                    $minutes += $overlapMinutes($timeIn, $now, $morning['start'], $morning['end']);
+                }
+
+                if ($afternoon) {
+                    $minutes += $overlapMinutes($timeIn, $now, $afternoon['start'], $afternoon['end']);
+                }
+
+                $lastBlockEnd = $afternoon ?? $morning ? $afternoon['end'] ?? $morning['end'] : null;
+                $recordedTimeOut = $now->greaterThan($lastBlockEnd) ? $lastBlockEnd : $now;
+
+                $attendance->update([
+                    'time_out' => $recordedTimeOut,
+                    'total_hours' => round($minutes / 60, 2),
+                    'over_time' => 0,
+                    'status' => 'Present',
+                ]);
+
+                return response()->json(['status'=>'success','message'=>"Time Out recorded for {$employee->first_name} {$employee->last_name}. Hours: ".round($minutes/60,2)]);
+            }
+        }
+
+        return response()->json(['status' => 'success', 'message' => 'Already timed out today.']);
     }
 
     public function show(Attendance $attendance)

@@ -45,6 +45,7 @@
                     <th>Time In</th> 
                     <th>Time Out</th>
                     <th>Total Work Hour</th>
+                    <th>Over Time</th>
                     <th>Status</th>
                     <th>Actions</th>
                 </tr>
@@ -58,25 +59,45 @@
                     <td>{{ $attendance->time_in ? \Carbon\Carbon::parse($attendance->time_in)->format('h:i A') : '-' }}</td>
                     <td>{{ $attendance->time_out ? \Carbon\Carbon::parse($attendance->time_out)->format('h:i A') : '-' }}</td>
                     <td>{{ $attendance->total_hours }}</td>
+                    <td>{{ $attendance->over_time }}</td>
                     <td>
                         @php
                             if ($attendance->status === 'On Leave') {
                                 $status = 'On Leave';
+                            } elseif ($attendance->time_in) {
+
+                                // If employee has time_in and no time_out → either Working or Late
+                                if (!$attendance->time_out) {
+
+                                    // SIMPLE LATE/WOKING CHECK (defaults to 07:00 for now)
+                                    $isLate = strtotime($attendance->time_in) > strtotime('07:00');
+
+                                    $status = $isLate ? 'Late' : 'Working';
+
+                                } else {
+                                    $status = 'Present';
+                                }
+
                             } else {
-                                $status = $attendance->time_in ? ($attendance->time_out ? 'Present' : 'Late') : 'Absent';
+                                $status = 'Absent';
                             }
                         @endphp
 
                         @if ($status == 'Present')
                             <span class="badge bg-success">Present</span>
+
+                        @elseif ($status == 'Working')
+                            <span class="badge bg-primary">Working</span>
+
                         @elseif ($status == 'Late')
                             <span class="badge bg-warning text-dark">Late</span>
+
                         @elseif ($status == 'On Leave')
                             <span class="badge bg-warning text-dark">On Leave</span>
+
                         @else
                             <span class="badge bg-secondary">Absent</span>
                         @endif
-
                     </td>
                     <td>
                         <form action="{{ route('attendance.destroy', $attendance->attendance_id) }}" method="POST" class="d-inline">

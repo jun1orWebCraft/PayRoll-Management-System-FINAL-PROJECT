@@ -109,4 +109,9 @@ class Employee extends Authenticatable
     {
         return $this->hasOne(NotificationPreference::class, 'employee_id', 'employee_id');
     }
+    
+    public function schedule()
+    {
+        return $this->hasOne(EmployeeSchedule::class, 'employee_id', 'employee_id');
+    }
 }

@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Carbon\Carbon;
 use App\Models\Employee;
 use App\Models\Payroll;
 use App\Models\Attendance;
@@ -295,6 +295,15 @@ class EmployeeController extends Controller
                 }
             }
         }
+        $month = Carbon::now()->month;
+        $year = Carbon::now()->year;
+
+        $totalOvertime = Attendance::whereMonth('date', $month)
+            ->whereYear('date', $year)
+            ->sum('over_time');
+        $attendancelogs = Attendance::where('employee_id', auth()->user()->employee_id)
+                         ->orderBy('date', 'desc')
+                         ->get();
 
         $attendanceRate = $totalDays > 0 ? round(($presentDays / $totalDays) * 100) : 0;
 
@@ -316,7 +325,9 @@ class EmployeeController extends Controller
             'presentDays',
             'absentDays',
             'totalHoursWorked',
-            'overtimeHours'
+            'overtimeHours',
+            'totalOvertime',
+            'attendancelogs'
         ));
     }
 
