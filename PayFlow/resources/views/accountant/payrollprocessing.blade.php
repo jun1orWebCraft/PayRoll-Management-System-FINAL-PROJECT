@@ -57,7 +57,6 @@
 
     {{-- Payroll Table --}}
     <div class="table-responsive bg-white rounded-4 shadow-sm border">
-        {{-- Horizontal scroll wrapper --}}
         <div style="overflow-x: auto; max-width: 100%;">
             <table class="table table-hover align-middle text-center mb-0" style="min-width: 900px;">
                 <thead class="table-primary">
@@ -78,6 +77,10 @@
                         @php
                             $employee = $payroll->employee ?? null;
                             $position = $employee->position ?? null;
+                            $basicSalary = $payroll->basic_salary ?? $employee->basic_salary ?? 0;
+                            $deductions = $payroll->deductions ?? $employee->deductions ?? 0;
+                            $overtimePay = $payroll->overtime_pay ?? 0;
+                            $netPay = $basicSalary + $overtimePay - $deductions;
                         @endphp
                         <tr>
                             <td style="white-space: nowrap;">{{ $employee->employee_no ?? 'N/A' }}</td>
@@ -86,9 +89,9 @@
                             </td>
                             <td style="white-space: nowrap;">{{ $position->position_name ?? 'N/A' }}</td>
                             <td style="white-space: nowrap;">{{ $payroll->pay_period_start }} - {{ $payroll->pay_period_end }}</td>
-                            <td style="white-space: nowrap;">₱{{ number_format(($payroll->basic_salary ?? 0) + ($payroll->overtime_pay ?? 0), 2) }}</td>
-                            <td style="white-space: nowrap;">₱{{ number_format($payroll->deductions ?? 0, 2) }}</td>
-                            <td class="fw-bold text-success" style="white-space: nowrap;">₱{{ number_format($payroll->net_pay ?? 0, 2) }}</td>
+                            <td style="white-space: nowrap;">₱{{ number_format($basicSalary + $overtimePay, 2) }}</td>
+                            <td style="white-space: nowrap;">₱{{ number_format($deductions, 2) }}</td>
+                            <td class="fw-bold text-success" style="white-space: nowrap;">₱{{ number_format($netPay, 2) }}</td>
                             <td style="white-space: nowrap;">
                                 <span class="badge bg-{{ $payroll->status == 'Processed' ? 'info' : ($payroll->status == 'Paid' ? 'success' : 'secondary') }}">
                                     {{ $payroll->status }}
@@ -102,7 +105,6 @@
                                         title="Edit Payroll">
                                     <i class="bi bi-pencil-square fs-5"></i>
                                 </button>
-
 
                                 {{-- View Button --}}
                                 <button class="btn btn-link text-primary p-0 me-2"
@@ -122,6 +124,7 @@
                                 </form>
                             </td>
                         </tr>
+
                         {{-- Edit Payroll Modal --}}
                         <div class="modal fade" id="editPayrollModal{{ $payroll->payroll_id }}" tabindex="-1" aria-hidden="true">
                             <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -161,8 +164,13 @@
 
                                                 <div class="col-md-6">
                                                     <label class="form-label fw-semibold">Overtime Hours</label>
+                                                    @php
+                                                        $employeeSalary = $employee->basic_salary ?? 0;
+                                                        $hourlyRate = $employeeSalary / 22 / 8; // 22 working days, 8 hrs/day
+                                                        $overtimeHours = $payroll->overtime_pay > 0 ? $payroll->overtime_pay / $hourlyRate : 0;
+                                                    @endphp
                                                     <input type="number" step="0.01" name="overtime_hours" class="form-control"
-                                                        value="{{ $payroll->basic_salary > 0 ? ($payroll->overtime_pay / (($payroll->basic_salary / 22) / 8)) : 0 }}">
+                                                        value="{{ $overtimeHours }}">
                                                 </div>
                                             </div>
                                         </div>
@@ -199,19 +207,19 @@
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="fw-semibold text-muted">Basic Salary</label>
-                                                <p>₱{{ number_format($payroll->basic_salary ?? 0, 2) }}</p>
+                                                <p>₱{{ number_format($basicSalary, 2) }}</p>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="fw-semibold text-muted">Overtime Pay</label>
-                                                <p>₱{{ number_format($payroll->overtime_pay ?? 0, 2) }}</p>
+                                                <p>₱{{ number_format($overtimePay, 2) }}</p>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="fw-semibold text-muted">Deductions</label>
-                                                <p>₱{{ number_format($payroll->deductions ?? 0, 2) }}</p>
+                                                <p>₱{{ number_format($deductions, 2) }}</p>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="fw-semibold text-muted">Net Pay</label>
-                                                <p class="fw-bold text-success">₱{{ number_format($payroll->net_pay ?? 0, 2) }}</p>
+                                                <p class="fw-bold text-success">₱{{ number_format($netPay, 2) }}</p>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="fw-semibold text-muted">Payment Date</label>

@@ -12,12 +12,12 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('employee_id');
             $table->foreign('employee_id')->references('employee_id')->on('employees')->onDelete('cascade');
-            $table->decimal('sss', 10, 2)->nullable();          
-            $table->decimal('philhealth', 10, 2)->nullable();
-            $table->decimal('pagibig', 10, 2)->nullable();
-            $table->decimal('withholding_tax', 10, 2)->nullable();
-            $table->decimal('total_deduction', 10, 2)->default(0);
-            $table->date('deduction_date')->nullable();
+            $table->decimal('sss', 10, 2)->default(0);          
+            $table->decimal('philhealth', 10, 2)->default(0); 
+            $table->decimal('pagibig', 10, 2)->default(0); 
+            $table->decimal('withholding_tax', 10, 2)->default(0); 
+            $table->decimal('total_deduction', 10, 2)->default(0); 
+            $table->date('deduction_date')->default(DB::raw('CURRENT_DATE'));
             $table->timestamps();
         });
     }

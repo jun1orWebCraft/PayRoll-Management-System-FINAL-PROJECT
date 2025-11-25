@@ -8,7 +8,6 @@
   {{-- ✅ Bootstrap CSS --}}
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
   <link rel="stylesheet" href="{{ asset('css/applayout.css') }}">
@@ -141,32 +140,30 @@ main {
       </div>
 
       <nav>
-    <a href="{{ route('accountant.dashboard') }}" 
-       class="nav-link {{ request()->routeIs('accountant.dashboard') ? 'active' : '' }}">
-        <span class="icon"><i class="bi bi-house-door-fill"></i></span>
-        <span>Dashboard</span>
-    </a>
+        <a href="{{ route('accountant.dashboard') }}" 
+           class="nav-link {{ request()->routeIs('accountant.dashboard') ? 'active' : '' }}">
+            <span class="icon"><i class="bi bi-house-door-fill"></i></span>
+            <span>Dashboard</span>
+        </a>
 
-    <a href="{{ route('accountant.payrollprocessing') }}" 
-       class="nav-link {{ request()->routeIs('accountant.payrollprocessing') ? 'active' : '' }}">
-        <span class="icon"><i class="bi bi-credit-card-fill"></i></span>
-        <span>Payroll Processing</span>
-    </a>
+        <a href="{{ route('accountant.payrollprocessing') }}" 
+           class="nav-link {{ request()->routeIs('accountant.payrollprocessing') ? 'active' : '' }}">
+            <span class="icon"><i class="bi bi-credit-card-fill"></i></span>
+            <span>Payroll Processing</span>
+        </a>
 
-    <a href="{{ route('accountant.deductions') }}" 
-       class="nav-link {{ request()->routeIs('accountant.deductions') ? 'active' : '' }}">
-        <span class="icon"><i class="bi bi-cash-stack"></i></span>
-        <span>Deductions</span>
-    </a>
+        <a href="{{ route('accountant.deductions') }}" 
+           class="nav-link {{ request()->routeIs('accountant.deductions') ? 'active' : '' }}">
+            <span class="icon"><i class="bi bi-cash-stack"></i></span>
+            <span>Deductions</span>
+        </a>
 
-    <a href="{{ route('accountant.settings') }}" 
-       class="nav-link {{ request()->routeIs('accountant.settings') ? 'active' : '' }}">
-        <span class="icon"><i class="bi bi-gear-fill"></i></span>
-         <span>Settings</span>
-    </a>
-
-</nav>
-
+        <a href="{{ route('accountant.settings') }}" 
+           class="nav-link {{ request()->routeIs('accountant.settings') ? 'active' : '' }}">
+            <span class="icon"><i class="bi bi-gear-fill"></i></span>
+             <span>Settings</span>
+        </a>
+      </nav>
 
       <div class="sidebar-footer">
         @if (Auth::check())
@@ -204,7 +201,7 @@ main {
     </main>
   </div>
 
-  {{-- ✅ Bootstrap JS --}}
+  {{-- Bootstrap JS --}}
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
@@ -221,5 +218,9 @@ main {
       }
     });
   </script>
+
+  {{-- ⭐ CRITICAL FIX — THIS LOADS YOUR CHART.JS SCRIPT --}}
+  @stack('scripts')
+
 </body>
 </html>

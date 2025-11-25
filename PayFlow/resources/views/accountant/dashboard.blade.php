@@ -3,70 +3,112 @@
 @section('content')
 <div class="container py-3">
 
-    {{-- Welcome Section --}}
-    <div class="mb-4 border-bottom pb-3">
-        <div class="d-flex align-items-center justify-content-between flex-wrap">
-            <div>
-                <h4 class="fw-bold mb-1">
-                    Welcome Back, <span class="text-primary">{{ Auth::user()->name ?? 'Accountant' }}</span>
-                </h4>
-                <p class="text-muted mb-0">Here’s your payroll overview at <strong>PayFlow</strong> today.</p>
-            </div>
-            <div class="text-end mt-3 mt-md-0">
-                <h6 class="mb-0 text-secondary"><i class="bi bi-building me-1"></i> <strong>PayFlow Payroll System</strong></h6>
-                <small class="text-muted">{{ now()->format('l, F j, Y') }}</small>
-            </div>
+    {{-- Header --}}
+    <div class="mb-4 border-bottom pb-3 d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="fw-bold mb-1">Welcome Back, <span class="text-primary">{{ Auth::user()->name ?? 'Accountant' }}</span></h4>
+            <p class="text-muted mb-0">Here’s your payroll overview at <strong>PayFlow</strong> today.</p>
+        </div>
+        <div class="text-end">
+            <small class="text-muted">{{ now()->format('l, F j, Y') }}</small>
         </div>
     </div>
 
-    {{-- Dashboard Summary Cards --}}
-    <div class="row g-3 mb-4">
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm rounded-4 text-center p-4 bg-gradient bg-light">
-                <i class="bi bi-graph-up-arrow text-primary fs-2 mb-2"></i>
-                <h6 class="text-muted">Total Payroll</h6>
-                <h4 class="fw-bold text-dark">₱{{ number_format($totalPayroll ?? 0, 2) }}</h4>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm rounded-4 text-center p-4 bg-gradient bg-light">
-                <i class="bi bi-dash-circle text-danger fs-2 mb-2"></i>
-                <h6 class="text-muted">Total Deduction</h6>
-                <h4 class="fw-bold text-dark">₱{{ number_format($totalDeductions ?? 0, 2) }}</h4>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm rounded-4 text-center p-4 bg-gradient bg-light">
-                <i class="bi bi-check-circle text-success fs-2 mb-2"></i>
-                <h6 class="text-muted">Processed Payrolls</h6>
-                <h4 class="fw-bold text-dark">{{ $processedPayrolls ?? 0 }}</h4>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm rounded-4 text-center p-4 bg-gradient bg-light">
-                <i class="bi bi-hourglass-split text-warning fs-2 mb-2"></i>
-                <h6 class="text-muted">Pending Payrolls</h6>
-                <h4 class="fw-bold text-dark">{{ $pendingPayrolls ?? 0 }}</h4>
+    {{-- Employee Payroll Status --}}
+    <div class="row g-4 mb-4">
+        <div class="col-lg-12">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-info text-white fw-bold">
+                    <i class="bi bi-person-lines-fill me-2"></i> Employee Payroll Status
+                </div>
+                <div class="card-body p-0">
+                    <table class="table mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($employeePayrollStatus ?? [] as $emp)
+                                <tr>
+                                    <td>{{ $emp['name'] }}</td>
+                                    <td>
+                                        <span class="badge {{ $emp['status'] == 'Processed' ? 'bg-success' : 'bg-warning' }}">
+                                            {{ $emp['status'] }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="2" class="text-center">No payroll records found</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="row g-4">
 
-        {{-- Recent Payrolls --}}
-        <div class="col-lg-7">
+        {{-- Payroll by Position --}}
+        <div class="col-lg-6">
             <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-header bg-primary text-white fw-bold d-flex align-items-center">
-                    <i class="bi bi-cash-stack me-2"></i> Recent Payrolls
+                <div class="card-header bg-primary text-white fw-bold">
+                    <i class="bi bi-bar-chart me-2"></i> Payroll by Position
+                </div>
+                <div class="card-body">
+                    <canvas id="payrollByPositionChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        {{-- Top 5 Earners --}}
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-success text-white fw-bold">
+                    <i class="bi bi-star me-2"></i> Top 5 Earners
+                </div>
+                <div class="card-body p-0">
+                    <table class="table mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Position</th>
+                                <th>Status</th>
+                                <th class="text-end">Net Pay</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                           @forelse($topEarners ?? [] as $earner)
+                             <tr>
+                                <td>{{ $earner['name'] }}</td>
+                                <td>{{ $earner['position'] }}</td>
+                                <td>
+                                    <span class="badge {{ $earner['status'] == 'Processed' ? 'bg-success' : 'bg-warning' }}">
+                                        {{ $earner['status'] }}
+                                    </span>
+                                </td>
+                                <td class="text-end">₱{{ number_format($earner['net_pay'],2) }}</td>
+                             </tr>
+                            @empty
+                                <tr><td colspan="4" class="text-center">No data found</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        {{-- Recent Payrolls --}}
+        <div class="col-lg-12">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-secondary text-white fw-bold">
+                    <i class="bi bi-clock-history me-2"></i> Recent Payrolls
                 </div>
                 <div class="card-body">
                     @forelse($recentPayrolls ?? [] as $payroll)
-                        @php
-                            $employee = $payroll->employee;
-                        @endphp
+                        @php $employee = $payroll->employee ?? null; @endphp
                         <div class="d-flex align-items-center justify-content-between border-bottom py-3">
                             <div class="d-flex align-items-center">
                                 <div class="rounded-circle bg-light p-2 me-3">
@@ -78,14 +120,14 @@
                                 <div>
                                     <h6 class="mb-0 fw-semibold">{{ $employee->first_name ?? '' }} {{ $employee->last_name ?? '' }}</h6>
                                     <small class="text-muted">
-                                        {{ \Carbon\Carbon::parse($payroll->pay_period_start)->format('M d') }} - 
-                                        {{ \Carbon\Carbon::parse($payroll->pay_period_end)->format('M d, Y') }}
+                                        {{ \Carbon\Carbon::parse($payroll->pay_period_start)->format('M d') ?? 'N/A' }} - 
+                                        {{ \Carbon\Carbon::parse($payroll->pay_period_end)->format('M d, Y') ?? 'N/A' }}
                                     </small>
                                 </div>
                             </div>
                             <div class="text-end">
+                                <small class="d-block text-secondary fw-semibold">Status: {{ $payroll->status ?? 'N/A' }}</small>
                                 <h6 class="fw-bold text-success mb-0">₱{{ number_format($payroll->net_pay ?? 0, 2) }}</h6>
-                                <small class="text-muted">{{ $payroll->status ?? 'N/A' }}</small>
                             </div>
                         </div>
                     @empty
@@ -95,38 +137,38 @@
             </div>
         </div>
 
-
-        {{-- Attendance Overview --}}
-        <div class="col-lg-5">
-            <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-header bg-secondary text-white fw-bold d-flex align-items-center">
-                    <i class="bi bi-calendar-check me-2"></i> Attendance Overview
-                </div>
-                <div class="card-body">
-                    @forelse($attendanceSummary ?? [] as $att)
-                        <div class="d-flex align-items-center justify-content-between border-bottom py-3">
-                            <div class="d-flex align-items-center">
-                                <div class="rounded-circle bg-light p-2 me-3">
-                                    <i class="bi bi-person-badge fs-4 text-secondary"></i>
-                                </div>
-                                <div>
-                                    <h6 class="mb-0 fw-semibold">{{ $att->employee->name ?? 'N/A' }}</h6>
-                                    <small class="text-muted">This Month</small>
-                                </div>
-                            </div>
-                            <div class="text-end">
-                                <small class="d-block text-danger fw-semibold">Absent: {{ $att->total_absent }}</small>
-                                <small class="d-block text-warning fw-semibold">Late: {{ $att->total_late }}</small>
-                                <small class="d-block text-success fw-semibold">Present: {{ $att->total_present }}</small>
-                            </div>
-                        </div>
-                    @empty
-                        <p class="text-muted text-center py-4 mb-0">No attendance records found.</p>
-                    @endforelse
-                </div>
-            </div>
-        </div>
-
     </div>
 </div>
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+@php
+$payrollByPosition = $payrollByPosition ?? collect();
+@endphp
+<script>
+    const posCtx = document.getElementById('payrollByPositionChart').getContext('2d');
+
+    const payrollByPositionChart = new Chart(posCtx, {
+        type: 'bar',
+        data: {
+            labels: {!! json_encode($payrollByPosition->pluck('position')?? []) !!},
+            datasets: [{
+                label: 'Net Pay',
+                data: {!! json_encode($payrollByPosition->pluck('total') ?? []) !!},
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+</script>
+
+@endpush
+
 @endsection

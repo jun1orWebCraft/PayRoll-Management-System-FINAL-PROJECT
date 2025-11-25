@@ -9,64 +9,67 @@ use Carbon\Carbon;
 
 class DeductionController extends Controller
 {
-    // Display all deductions
+    // Show deductions page
     public function deduction()
     {
-        // Load deductions with employee data
-        $deductions = Deduction::with('employee')
-                        ->orderBy('deduction_date', 'desc')
-                        ->get();
-
+        $deductions = Deduction::with('employee')->orderBy('deduction_date', 'desc')->get();
         $employees = Employee::where('employment_type', 'Full-Time')->get();
 
         return view('accountant.deduction', compact('deductions', 'employees'));
     }
 
+    // Store a new deduction
     public function store(Request $request)
     {
-    $request->validate([
-        'employee_id' => 'required|exists:employees,id',
-        'deduction_date' => 'nullable|date',
-    ]);
+        $request->validate([
+            'employee_id' => 'required|exists:employees,employee_id',
+        ]);
 
-    $employee = Employee::findOrFail($request->employee_id);
-    $monthlySalary = $employee->monthly_salary ?? $employee->basic_salary ?? 0;
+        $employee = Employee::findOrFail($request->employee_id);
+        $salary = $employee->basic_salary ?? 0;
 
-    // Check which deductions were selected in the modal
-    $sss = $request->has('sss') && $employee->is_availing_sss ? $monthlySalary * 0.05 : 0;
-    $philhealth = $request->has('philhealth') && $employee->is_availing_philhealth 
-        ? max(500, min($monthlySalary * 0.025, 2500)) 
-        : 0;
-    $pagibig = $request->has('pagibig') && $employee->is_availing_pagibig ? 100 : 0;
-    $withholdingTax = $request->has('withholding_tax') && $employee->is_subject_to_tax
-        ? $this->computeWithholdingTax($monthlySalary)
-        : 0;
+        $sss = $request->has('sss') ? $salary * 0.05 : 0;
+        $philhealth = $request->has('philhealth') ? $salary * 0.025 : 0;
+        $pagibig = $request->has('pagibig') ? 100 : 0;
+        $withholdingTax = $request->has('withholding_tax') ? $this->computeWithholdingTax($salary) : 0;
 
-    $total = $sss + $philhealth + $pagibig + $withholdingTax;
+        $total = $sss + $philhealth + $pagibig + $withholdingTax;
 
-    $deductionDate = $request->deduction_date 
-        ? Carbon::parse($request->deduction_date) 
-        : Carbon::now();
+        $deduction = Deduction::create([
+            'employee_id' => $employee->employee_id,
+            'sss' => $sss,
+            'philhealth' => $philhealth,
+            'pagibig' => $pagibig,
+            'withholding_tax' => $withholdingTax,
+            'total_deduction' => $total,
+            'deduction_date' => Carbon::now(),
+        ]);
 
-    Deduction::create([
-        'employee_id' => $employee->id,
-        'sss' => $sss,
-        'philhealth' => $philhealth,
-        'pagibig' => $pagibig,
-        'withholding_tax' => $withholdingTax,
-        'total_deduction' => $total,
-        'deduction_date' => $deductionDate,
-    ]);
+        $deduction->load('employee');
 
-    return redirect()->route('accountant.deductions')
-                     ->with('success', 'Deduction computed successfully!');
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'deduction' => $deduction
+            ]);
+        }
+
+        return redirect()->route('accountant.deductions')
+            ->with('success', 'Deduction added successfully!');
     }
 
-
-    // Compute monthly withholding tax
-    private function computeWithholdingTax($monthlySalary)
+    // Delete a deduction
+    public function destroy(Deduction $deduction)
     {
-        $annual = $monthlySalary * 12;
+        $deduction->delete();
+        return redirect()->route('accountant.deductions')
+            ->with('success', 'Deduction deleted successfully!');
+    }
+
+    // Compute withholding tax
+    private function computeWithholdingTax($basicSalary)
+    {
+        $annual = $basicSalary * 12;
         $tax = 0;
 
         if ($annual <= 250000) {
@@ -84,5 +87,19 @@ class DeductionController extends Controller
         }
 
         return $tax / 12;
+    }
+
+    // AJAX: compute deduction amounts dynamically
+    public function ajaxCompute(Employee $employee)
+    {
+        $salary = $employee->basic_salary ?? 0;
+
+        return response()->json([
+            'basic_salary' => $salary,
+            'sss' => $salary * 0.05,
+            'philhealth' => $salary * 0.025,
+            'pagibig' => 100,
+            'withholding_tax' => $this->computeWithholdingTax($salary),
+        ]);
     }
 }

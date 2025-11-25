@@ -76,6 +76,7 @@ class Employee extends Authenticatable
         return $this->hasMany(Deduction::class, 'employee_id', 'employee_id');
     }
 
+
     // Employee has many Leave Requests (as requester)
     public function leaveRequests()
     {

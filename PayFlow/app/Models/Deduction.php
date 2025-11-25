@@ -9,8 +9,6 @@ class Deduction extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'id'; // default, matches your current migration
-
     protected $fillable = [
         'employee_id',
         'sss',
@@ -21,9 +19,12 @@ class Deduction extends Model
         'deduction_date',
     ];
 
-    // Relationship: Deduction belongs to an Employee
+
     public function employee()
     {
         return $this->belongsTo(Employee::class, 'employee_id', 'employee_id');
     }
+
+
+
 }
