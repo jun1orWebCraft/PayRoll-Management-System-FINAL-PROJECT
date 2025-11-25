@@ -6,7 +6,7 @@ use App\Models\Payroll;
 use App\Models\Employee;
 use App\Models\Position;
 use App\Models\Attendance;
-use App\Models\Deduction; 
+use App\Models\Deduction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
@@ -39,7 +39,7 @@ class PayrollController extends Controller
         return view('accountant.payrollprocessing', compact('employees', 'payrolls', 'positions'));
     }
 
-    // Store Payroll Record (Auto Compute based on Attendance)
+    // Store Payroll Record
     public function store(Request $request)
     {
         $request->validate([
@@ -50,47 +50,56 @@ class PayrollController extends Controller
 
         $employee = Employee::with('position')->findOrFail($request->employee_id);
 
-        // Fetch all attendance records within the pay period
+        // Calculate working days in the pay period (Mon-Sat)
+        $periodStart = Carbon::parse($request->pay_period_start);
+        $periodEnd = Carbon::parse($request->pay_period_end);
+        $workingDays = 0;
+        for ($date = $periodStart; $date->lte($periodEnd); $date->addDay()) {
+            if ($date->isWeekday()) {
+                $workingDays++;
+            }
+        }
+
+        // Fetch attendance records
         $attendances = Attendance::where('employee_id', $employee->employee_id)
             ->whereBetween('date', [$request->pay_period_start, $request->pay_period_end])
             ->where('status', 'Present')
             ->get();
 
-        $totalHours = $attendances->sum('total_hours');
         $daysPresent = $attendances->count();
+        $totalHours = $attendances->sum('total_hours');
 
-        // Base salary logic
+        // Base salary
         $baseSalary = $employee->position->salary_rate ?? $employee->basic_salary;
 
         if ($employee->employment_type === 'Full-Time') {
-            // Assume 22 working days/month
-            $dailyRate = $baseSalary / 22;
-            $grossPay = $daysPresent * $dailyRate;
+            $dailyRate = $baseSalary / $workingDays;
+            $basicPay = $daysPresent * $dailyRate;
             $overtimePay = max(0, $totalHours - ($daysPresent * 8)) * ($dailyRate / 8 * 1.25);
         } else {
-            // Part-time: hourly basis
-            $hourlyRate = ($employee->position->salary_rate ?? 0) / 8;
-            $grossPay = $totalHours * $hourlyRate;
+            $hourlyRate = ($employee->position->salary_rate ?? $baseSalary) / 8;
+            $basicPay = $totalHours * $hourlyRate;
             $overtimePay = 0;
         }
 
-        // Get deduction for the employee in this pay period
-        $deductionRecord = Deduction::where('employee_id', $employee->id)
-            ->whereMonth('deduction_date', Carbon::parse($request->pay_period_end)->month)
-            ->whereYear('deduction_date', Carbon::parse($request->pay_period_end)->year)
-            ->first();
+        $grossPay = $basicPay + $overtimePay;
 
-        $deductions = $deductionRecord->total_deduction ?? 0;
+        // Fetch deductions
+        $deductions = Deduction::where('employee_id', $employee->employee_id)
+                        ->whereBetween('deduction_date', [$request->pay_period_start, $request->pay_period_end])
+                        ->sum('total_deduction');
 
-        // Net Pay
-        $netPay = $grossPay + $overtimePay - $deductions;
+        // Net pay
+        $netPay = $grossPay - $deductions;
 
+        // Save payroll
         Payroll::create([
             'employee_id' => $employee->employee_id,
             'pay_period_start' => $request->pay_period_start,
             'pay_period_end' => $request->pay_period_end,
-            'basic_salary' => $grossPay,
+            'basic_salary' => $basicPay,
             'overtime_pay' => $overtimePay,
+            'gross_pay' => $grossPay, // optional column if you have it
             'deductions' => $deductions,
             'net_pay' => $netPay,
             'payment_date' => now(),
@@ -123,44 +132,48 @@ class PayrollController extends Controller
         $payroll = Payroll::findOrFail($id);
         $employee = Employee::with('position')->findOrFail($request->employee_id);
 
-        // Recalculate based on updated attendance
+        $periodStart = Carbon::parse($request->pay_period_start);
+        $periodEnd = Carbon::parse($request->pay_period_end);
+        $workingDays = 0;
+        for ($date = $periodStart; $date->lte($periodEnd); $date->addDay()) {
+            if ($date->isWeekday()) $workingDays++;
+        }
+
         $attendances = Attendance::where('employee_id', $employee->employee_id)
             ->whereBetween('date', [$request->pay_period_start, $request->pay_period_end])
             ->where('status', 'Present')
             ->get();
 
-        $totalHours = $attendances->sum('total_hours');
         $daysPresent = $attendances->count();
+        $totalHours = $attendances->sum('total_hours');
 
         $baseSalary = $employee->position->salary_rate ?? $employee->basic_salary;
 
         if ($employee->employment_type === 'Full-Time') {
-            $dailyRate = $baseSalary / 22;
-            $grossPay = $daysPresent * $dailyRate;
+            $dailyRate = $baseSalary / $workingDays;
+            $basicPay = $daysPresent * $dailyRate;
             $overtimePay = max(0, $totalHours - ($daysPresent * 8)) * ($dailyRate / 8 * 1.25);
         } else {
-            $hourlyRate = ($employee->position->salary_rate ?? 0) / 8;
-            $grossPay = $totalHours * $hourlyRate;
+            $hourlyRate = ($employee->position->salary_rate ?? $baseSalary) / 8;
+            $basicPay = $totalHours * $hourlyRate;
             $overtimePay = 0;
         }
 
-        // Only deduct if deduction records exist
-        $deductionRecords = Deduction::where('employee_id', $employee->employee_id)
-            ->whereBetween('created_at', [$request->pay_period_start, $request->pay_period_end])
-            ->get();
+        $grossPay = $basicPay + $overtimePay;
 
-        $deductions = $deductionRecords->count() > 0
-            ? $deductionRecords->sum('amount')
-            : 0;
+        $deductions = Deduction::where('employee_id', $employee->employee_id)
+                        ->whereBetween('deduction_date', [$request->pay_period_start, $request->pay_period_end])
+                        ->sum('total_deduction');
 
-        $netPay = $grossPay + $overtimePay - $deductions;
+        $netPay = $grossPay - $deductions;
 
         $payroll->update([
             'employee_id' => $employee->employee_id,
             'pay_period_start' => $request->pay_period_start,
             'pay_period_end' => $request->pay_period_end,
-            'basic_salary' => $grossPay,
+            'basic_salary' => $basicPay,
             'overtime_pay' => $overtimePay,
+            'gross_pay' => $grossPay,
             'deductions' => $deductions,
             'net_pay' => $netPay,
             'status' => 'Processed',
@@ -170,7 +183,7 @@ class PayrollController extends Controller
             ->with('success', 'Payroll updated successfully!');
     }
 
-    // Delete Payroll Record
+    // Delete Payroll
     public function destroy($id)
     {
         $payroll = Payroll::findOrFail($id);
@@ -180,7 +193,7 @@ class PayrollController extends Controller
             ->with('success', 'Payroll record deleted successfully!');
     }
 
-    // Password Update (for Accountant/User)
+    // Update Password
     public function updatePassword(Request $request)
     {
         $request->validate([
