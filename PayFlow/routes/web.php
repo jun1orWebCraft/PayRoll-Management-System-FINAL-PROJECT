@@ -62,6 +62,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/deductions', [DeductionController::class, 'deduction'])->name('deductions');
     Route::post('/deductions/store', [DeductionController::class, 'store'])->name('deductions.store');
     Route::get('/accountant/deductions/compute/{employee}', [DeductionController::class, 'ajaxCompute']);
+    Route::get('/accountant/deductions/compute/{employee_id}', [DeductionController::class, 'compute']);
     Route::get('/settings', [AccountantController::class, 'settings'])->name('settings');
     Route::post('/update-password', [PayrollController::class, 'updatePassword'])->name('update.password');
     });

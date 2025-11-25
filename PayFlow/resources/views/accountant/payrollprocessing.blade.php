@@ -77,7 +77,7 @@
                         @php
                             $employee = $payroll->employee ?? null;
                             $position = $employee->position ?? null;
-                            $basicSalary = $payroll->basic_salary ?? $employee->basic_salary ?? 0;
+                            $basicSalary = $employee->basic_salary ?? 0;
                             $deductions = $payroll->deductions ?? $employee->deductions ?? 0;
                             $overtimePay = $payroll->overtime_pay ?? 0;
                             $netPay = $basicSalary + $overtimePay - $deductions;
@@ -163,15 +163,11 @@
                                                 </div>
 
                                                 <div class="col-md-6">
-                                                    <label class="form-label fw-semibold">Overtime Hours</label>
-                                                    @php
-                                                        $employeeSalary = $employee->basic_salary ?? 0;
-                                                        $hourlyRate = $employeeSalary / 22 / 8; // 22 working days, 8 hrs/day
-                                                        $overtimeHours = $payroll->overtime_pay > 0 ? $payroll->overtime_pay / $hourlyRate : 0;
-                                                    @endphp
-                                                    <input type="number" step="0.01" name="overtime_hours" class="form-control"
-                                                        value="{{ $overtimeHours }}">
+                                                    <label class="form-label fw-semibold">Overtime Pay</label>
+                                                    <input type="number" step="0.01" name="overtime_pay" class="form-control"
+                                                    value="{{ $payroll->overtime_pay ?? 0 }}">
                                                 </div>
+
                                             </div>
                                         </div>
                                         <div class="modal-footer border-0">
@@ -207,7 +203,7 @@
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="fw-semibold text-muted">Basic Salary</label>
-                                                <p>₱{{ number_format($basicSalary, 2) }}</p>
+                                                <p>₱{{ number_format($employee->basic_salary ?? 0, 2) }}</p>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="fw-semibold text-muted">Overtime Pay</label>
@@ -281,8 +277,9 @@
                                 <input type="date" name="pay_period_end" class="form-control" required>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-semibold">Overtime Hours</label>
-                                <input type="number" step="0.01" name="overtime_hours" class="form-control">
+                                <label class="form-label fw-semibold">Overtime Pay</label>
+                               <input type="number" step="0.01" name="overtime_pay" class="form-control"
+                                value="{{ $payroll->overtime_pay ?? 0 }}">
                             </div>
                         </div>
                     </div>
@@ -299,18 +296,9 @@
 
 {{-- Optional inline styles for nicer horizontal scrollbar --}}
 <style>
-    div[style*="overflow-x: auto"]::-webkit-scrollbar {
-        height: 8px;
-    }
-    div[style*="overflow-x: auto"]::-webkit-scrollbar-track {
-        background: #f1f1f1;
-    }
-    div[style*="overflow-x: auto"]::-webkit-scrollbar-thumb {
-        background: #888;
-        border-radius: 4px;
-    }
-    div[style*="overflow-x: auto"]::-webkit-scrollbar-thumb:hover {
-        background: #555;
-    }
+    div[style*="overflow-x: auto"]::-webkit-scrollbar { height: 8px; }
+    div[style*="overflow-x: auto"]::-webkit-scrollbar-track { background: #f1f1f1; }
+    div[style*="overflow-x: auto"]::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+    div[style*="overflow-x: auto"]::-webkit-scrollbar-thumb:hover { background: #555; }
 </style>
 @endsection
