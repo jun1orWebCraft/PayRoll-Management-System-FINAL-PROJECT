@@ -29,7 +29,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif
-                <form method="POST" action="{{ route('account.update.password') }}">
+                <form method="POST" action="{{ route('accountant.update.password') }}">
                     @csrf
                     {{-- Current Password --}}
                     <div class="mb-3">

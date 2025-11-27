@@ -31,41 +31,39 @@ Route::middleware('web')->group(function () {
 
 
     Route::middleware(['auth'])->group(function () {
+        Route::get('/', [PayFlowController::class, 'dashboard'])->name('dashboard');
+        Route::get('/employees', [PayFlowController::class, 'employees'])->name('employees');
+        Route::get('/attendance', [PayFlowController::class, 'attendance'])->name('attendance');
+        Route::get('/payrolldata', [PayFlowController::class, 'payrolldata'])->name('payrolldata');
+        Route::get('/reports', [PayFlowController::class, 'reports'])->name('reports');
+        Route::get('/settings', [PayFlowController::class, 'settings'])->name('settings');
+        Route::get('/employeeschedule', [PayFlowController::class, 'employeeschedule'])->name('employeeschedule');
 
-    Route::get('/', [PayFlowController::class, 'dashboard'])->name('dashboard');
-    Route::get('/employees', [PayFlowController::class, 'employees'])->name('employees');
-    Route::get('/attendance', [PayFlowController::class, 'attendance'])->name('attendance');
-    Route::get('/payrolldata', [PayFlowController::class, 'payrolldata'])->name('payrolldata');
-    Route::get('/reports', [PayFlowController::class, 'reports'])->name('reports');
-    Route::get('/settings', [PayFlowController::class, 'settings'])->name('settings');
-    Route::get('/employeeschedule', [PayFlowController::class, 'employeeschedule'])->name('employeeschedule');
+        Route::put('/leave-requests/{leave_request_id}/approve', [LeaveRequestController::class, 'approve'])->name('leave.approve');
+        Route::put('/leave-requests/{leave_request_id}/reject', [LeaveRequestController::class, 'reject'])->name('leave.reject');
 
-    Route::put('/leave-requests/{leave_request_id}/approve', [LeaveRequestController::class, 'approve'])->name('leave.approve');
-    Route::put('/leave-requests/{leave_request_id}/reject', [LeaveRequestController::class, 'reject'])->name('leave.reject');
+        Route::post('/settings/update-password', [PayFlowController::class, 'updatePassword'])->name('hr.update-password');
 
-    Route::post('/settings/update-password', [PayFlowController::class, 'updatePassword'])->name('hr.update-password');
-
-    Route::resource('employees', EmployeeController::class);
-    Route::resource('employeeschedule', EmployeeScheduleController::class);
-    Route::resource('attendance', AttendanceController::class);
-    Route::get('/attendance-scanner', [AttendanceController::class, 'scanner'])->name('attendance.scanner');
-    Route::post('/attendance-scanner/store', [AttendanceController::class, 'storeScanner'])->name('attendance.scanner.store');
-    });
-
+        Route::resource('employees', EmployeeController::class);
+        Route::resource('employeeschedule', EmployeeScheduleController::class);
+        Route::resource('attendance', AttendanceController::class);
+        Route::get('/attendance-scanner', [AttendanceController::class, 'scanner'])->name('attendance.scanner');
+        Route::post('/attendance-scanner/store', [AttendanceController::class, 'storeScanner'])->name('attendance.scanner.store');
+     });
     Route::middleware(['namecheck:Accountant'])->prefix('accountant')->name('accountant.')->group(function () {
-    Route::get('/dashboard', [AccountantController::class, 'dashboard'])->name('dashboard');
-    Route::get('/payrollprocessing', [PayrollController::class, 'index'])->name('payrollprocessing');
-    Route::post('/payrollprocessing/store', [PayrollController::class, 'store'])->name('payrollprocessing.store');
-    Route::get('/payrollprocessing/{id}/edit', [PayrollController::class, 'edit'])->name('payrollprocessing.edit');
-    Route::put('/payrollprocessing/{id}', [PayrollController::class, 'update'])->name('payrollprocessing.update');
-    Route::delete('/payrollprocessing/{id}', [PayrollController::class, 'destroy'])->name('payrollprocessing.destroy');
-    Route::delete('/deductions/{deduction}', [DeductionController::class, 'destroy'])->name('deductions.destroy');
-    Route::get('/deductions', [DeductionController::class, 'deduction'])->name('deductions');
-    Route::post('/deductions/store', [DeductionController::class, 'store'])->name('deductions.store');
-    Route::get('/accountant/deductions/compute/{employee}', [DeductionController::class, 'ajaxCompute']);
-    Route::get('/accountant/deductions/compute/{employee_id}', [DeductionController::class, 'compute']);
-    Route::get('/settings', [AccountantController::class, 'settings'])->name('settings');
-    Route::post('/update-password', [PayrollController::class, 'updatePassword'])->name('update.password');
+        Route::get('/dashboard', [AccountantController::class, 'dashboard'])->name('dashboard');
+        Route::get('/payrollprocessing', [PayrollController::class, 'index'])->name('payrollprocessing');
+        Route::post('/payrollprocessing/store', [PayrollController::class, 'store'])->name('payrollprocessing.store');
+        Route::get('/payrollprocessing/{id}/edit', [PayrollController::class, 'edit'])->name('payrollprocessing.edit');
+        Route::put('/payrollprocessing/{id}', [PayrollController::class, 'update'])->name('payrollprocessing.update');
+        Route::delete('/payrollprocessing/{id}', [PayrollController::class, 'destroy'])->name('payrollprocessing.destroy');
+        Route::delete('/deductions/{deduction}', [DeductionController::class, 'destroy'])->name('deductions.destroy');
+        Route::get('/deductions', [DeductionController::class, 'deduction'])->name('deductions');
+        Route::post('/deductions/store', [DeductionController::class, 'store'])->name('deductions.store');
+        Route::get('/accountant/deductions/compute/{employee}', [DeductionController::class, 'ajaxCompute']);
+        Route::get('/accountant/deductions/compute/{employee_id}', [DeductionController::class, 'compute']);
+        Route::get('/accountant/settings', [AccountantController::class, 'settings'])->name('settings');
+        Route::post('update-password', [PayrollController::class, 'updatePassword'])->name('update.password');
     });
 
     Route::middleware(['auth:employee'])->prefix('employeepages')->group(function () {

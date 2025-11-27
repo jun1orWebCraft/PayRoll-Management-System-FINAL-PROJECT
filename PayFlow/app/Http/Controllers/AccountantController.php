@@ -56,4 +56,8 @@ class AccountantController extends Controller
             'employeePayrollStatus'
         ));
     }
+    public function settings()
+    {
+        return view('accountant.settings');
+    }
 }
