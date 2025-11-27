@@ -28,9 +28,9 @@ Route::middleware('web')->group(function () {
 
     Route::get('/reset-password/{token}', fn($token) => view('auth.reset-password', ['token' => $token]))->name('password.reset');
     Route::post('reset-password', [NewPasswordController::class, 'store'])->name('password.update');
-});
 
-Route::middleware(['auth'])->group(function () {
+
+    Route::middleware(['auth'])->group(function () {
 
     Route::get('/', [PayFlowController::class, 'dashboard'])->name('dashboard');
     Route::get('/employees', [PayFlowController::class, 'employees'])->name('employees');
@@ -50,6 +50,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('attendance', AttendanceController::class);
     Route::get('/attendance-scanner', [AttendanceController::class, 'scanner'])->name('attendance.scanner');
     Route::post('/attendance-scanner/store', [AttendanceController::class, 'storeScanner'])->name('attendance.scanner.store');
+    });
 
     Route::middleware(['namecheck:Accountant'])->prefix('accountant')->name('accountant.')->group(function () {
     Route::get('/dashboard', [AccountantController::class, 'dashboard'])->name('dashboard');
@@ -80,4 +81,5 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/payslip/{payroll}', [EmployeeController::class, 'viewPayslip'])->name('employee.payslip.view');
         Route::get('/payslip/{payroll}/download', [EmployeeController::class, 'downloadPayslip'])->name('employee.payslip.download');
     });
+   
 });
