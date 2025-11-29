@@ -56,7 +56,7 @@
             </thead>
             <tbody>
                 @forelse ($employees as $employee)
-                <tr data-bs-toggle="modal" data-bs-target="#employeeDetailsModal{{ $employee->employee_id }}">
+                <tr>
                     <td>{{ $employee->employee_no }}</td>
                     <td class="fw-semibold">{{ $employee->first_name }} {{ $employee->last_name }}</td>
                     <td>{{ $employee->email }}</td>

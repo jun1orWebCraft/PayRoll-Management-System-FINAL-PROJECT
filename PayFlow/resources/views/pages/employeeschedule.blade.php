@@ -8,7 +8,7 @@
     {{--Header --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="fw-bold text-dark">Employee Schedules</h2>
+            <h2 class="fw-bold text-dark">Part-Time Employee Schedules</h2>
             <p class="text-muted mb-0">Manage and track employee weekly schedules</p>
         </div>
         <button class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#addScheduleModal">

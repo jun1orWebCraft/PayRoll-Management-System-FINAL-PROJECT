@@ -149,26 +149,53 @@
         </div>
     </div>
 </div>
-
-{{-- ✅ Move modals OUTSIDE the table --}}
-@foreach ($leaveRequests as $leave)
+        @foreach ($leaveRequests as $leave)
 <div class="modal fade" id="leaveModal{{ $leave->leave_request_id }}" tabindex="-1" aria-labelledby="leaveModalLabel{{ $leave->leave_request_id }}" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="leaveModalLabel{{ $leave->leave_request_id }}">Leave Request Details</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg" style="background: #fdfcf8;">
+            <div class="modal-header border-0">
+                <h5 class="modal-title w-100 text-center" id="leaveModalLabel{{ $leave->leave_request_id }}" style="font-weight: bold; letter-spacing: 1px;">
+                    Leave Request Details
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <p><strong>Employee No:</strong> {{ $leave->employee->employee_no }}</p>
-                <p><strong>Employee Name:</strong> {{ $leave->employee->first_name ?? 'Unknown' }} {{ $leave->employee->last_name ?? '' }}</p>
-                <p><strong>Leave Type:</strong> {{ $leave->leave_type }}</p>
-                <p><strong>Reason:</strong> {{ $leave->reason ?? 'N/A' }}</p>
-                <p><strong>Start Date:</strong> {{ \Carbon\Carbon::parse($leave->start_date)->format('M d, Y') }}</p>
-                <p><strong>End Date:</strong> {{ \Carbon\Carbon::parse($leave->end_date)->format('M d, Y') }}</p>
-                <p><strong>Status:</strong> {{ $leave->status }}</p>
+            <div class="modal-body p-5">
+                <div class="text-center mb-4">
+                    <h6 class="text-muted" style="letter-spacing: 1px;">Employee Leave Request Form</h6>
+                    <hr style="border-top: 2px solid #ccc; width: 50%;">
+                </div>
+
+                <div class="mb-3">
+                    <p><strong>Employee No:</strong> {{ $leave->employee->employee_no }}</p>
+                    <p><strong>Employee Name:</strong> {{ $leave->employee->first_name ?? 'Unknown' }} {{ $leave->employee->last_name ?? '' }}</p>
+                    <p><strong>Leave Type:</strong> {{ $leave->leave_type }}</p>
+                    <p><strong>Status:</strong>
+                        <span class="badge 
+                            @if($leave->status === 'Approved') bg-success
+                            @elseif($leave->status === 'Rejected') bg-danger
+                            @else bg-warning text-dark
+                            @endif">
+                            {{ $leave->status }}
+                        </span>
+                    </p>
+                </div>
+
+                <div class="mb-3">
+                    <p><strong>Reason:</strong></p>
+                    <p class="border p-3" style="background: #fff; min-height: 60px;">{{ $leave->reason ?? 'N/A' }}</p>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <p><strong>Start Date:</strong> {{ \Carbon\Carbon::parse($leave->start_date)->format('M d, Y') }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>End Date:</strong> {{ \Carbon\Carbon::parse($leave->end_date)->format('M d, Y') }}</p>
+                    </div>
+                </div>
             </div>
-            <div class="modal-footer">
+
+            <div class="modal-footer justify-content-center border-0">
                 @if ($leave->status === 'Pending')
                     <form action="{{ route('leave.approve', $leave->leave_request_id) }}" method="POST" class="d-inline">
                         @csrf

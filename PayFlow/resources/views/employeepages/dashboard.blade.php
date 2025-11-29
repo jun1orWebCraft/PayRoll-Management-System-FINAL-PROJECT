@@ -1,92 +1,97 @@
 @extends('layouts.employeeapp')
 
 @section('content')
-<div class="container  mb-5">
+<div class="container mb-5">
     <!-- TOP BAR: Date/Time + Notification -->
-    <div class="d-flex align-items-center justify-content-start mb-4 gap-3">
-    <!-- Dashboard Title -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between mb-4 gap-3">
+        <!-- Dashboard Title -->
         <h3 class="fw-bold mb-0">Dashboard</h3>
 
-        <!-- Current Date & Time -->
-        <div class="d-flex align-items-center justify-content-end gap-2 px-3 py-1 rounded-3 bg-bold shadow-sm">
-            <i class="bi bi-clock fs-5 text-secondary"></i>
-            <span class="fw-medium" id="currentDateTime"></span>
-        </div>
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <!-- Current Date & Time -->
+            <div class="d-flex align-items-center gap-2 px-2 px-md-3 py-1 rounded-3 bg-bold shadow-sm">
+                <i class="bi bi-clock fs-5 text-secondary"></i>
+                <span class="fw-medium" id="currentDateTime"></span>
+            </div>
 
-        <!-- Notification Icon -->
-        <div class="position-relative" style="cursor:pointer;" data-bs-toggle="modal" data-bs-target="#notificationModal">
-            <i class="bi bi-bell fs-4 text-secondary"></i>
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                {{ $notifications->where('is_read', 0)->count() }}
-            </span>
-        </div>
-        <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="notificationModalLabel">Notifications</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    @if($notifications->count() > 0)
-                        <ul class="list-group">
-                            @foreach($notifications as $notification)
-                                <li class="list-group-item d-flex justify-content-between align-items-center {{ $notification->is_read ? '' : 'fw-bold' }}">
-                                    <span>{{ $notification->message }}</span>
-                                </li>
-                            @endforeach
-                        </ul>
-                    @else
-                        <p class="text-center mb-0">No notifications</p>
-                    @endif
-                </div>
-                <div class="modal-footer">
-                    <form action="{{ route('notifications.markAllRead') }}" method="POST">
-                        @csrf
-                        <button type="submit" class="btn btn-success btn-sm">Mark All as Read</button>
-                    </form>
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
-                </div>
-                </div>
+            <!-- Notification Icon -->
+            <div class="position-relative" style="cursor:pointer;" data-bs-toggle="modal" data-bs-target="#notificationModal">
+                <i class="bi bi-bell fs-4 text-secondary"></i>
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    {{ $notifications->where('is_read', 0)->count() }}
+                </span>
             </div>
         </div>
 
+        <!-- Notification Modal -->
+        <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="notificationModalLabel">Notifications</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        @if($notifications->count() > 0)
+                            <ul class="list-group">
+                                @foreach($notifications as $notification)
+                                    <li class="list-group-item d-flex justify-content-between align-items-center {{ $notification->is_read ? '' : 'fw-bold' }}">
+                                        <span>{{ $notification->message }}</span>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <p class="text-center mb-0">No notifications</p>
+                        @endif
+                    </div>
+                    <div class="modal-footer">
+                        <form action="{{ route('notifications.markAllRead') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="btn btn-success btn-sm">Mark All as Read</button>
+                        </form>
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
     <!-- TOP CARDS -->
     <div class="row g-3 mb-4">
-        <div class="col-md-6 d-flex">
-            <div class="card shadow-sm border-0 rounded-4 p-4 w-100 h-100 d-flex flex-column justify-content-between">
+        <div class="col-12 col-md-6 d-flex">
+            <div class="card shadow-sm border-0 rounded-4 p-3 p-md-4 w-100 d-flex flex-column justify-content-between">
                 <h5 class="fw-bold mb-3">Attendance Summary - This Month</h5>
-                <div class="row text-center">
-                    <div class="col-md-3">
+                <div class="row text-center g-2">
+                    <div class="col-6 col-md-3">
                         <h4 class="fw-bold text-primary">{{ $presentDays }}</h4>
                         <p class="text-muted small mb-0">Days Present</p>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-6 col-md-3">
                         <h4 class="fw-bold text-danger">{{ $absentDays }}</h4>
                         <p class="text-muted small mb-0">Days Absent</p>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-6 col-md-3">
                         <h4 class="fw-bold text-success">{{ round($totalHoursWorked) }}</h4>
                         <p class="text-muted small mb-0">Hours Worked</p>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-6 col-md-3">
                         <h4 class="fw-bold text-info">{{ round($totalOvertime) }}</h4>
                         <p class="text-muted small mb-0">Overtime Hours</p>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 d-flex">
-            <div class="card shadow-sm border-0 rounded-4 p-3 w-100 h-100 d-flex flex-column justify-content-between">
+
+        <div class="col-6 col-md-3 d-flex">
+            <div class="card shadow-sm border-0 rounded-4 p-3 w-100 d-flex flex-column justify-content-between">
                 <h6 class="text-muted"><i class="bi bi-calendar3 me-2"></i>Leave Balance</h6>
                 <h4 class="fw-bold text-purple">{{ $latestLeaveRemaining }} days</h4>
                 <small>{{ $latestLeaveType }} remaining</small>
             </div>
         </div>
 
-        <div class="col-md-3 d-flex">
-            <div class="card shadow-sm border-0 rounded-4 p-3 w-100 h-100 d-flex flex-column justify-content-between">
+        <div class="col-6 col-md-3 d-flex">
+            <div class="card shadow-sm border-0 rounded-4 p-3 w-100 d-flex flex-column justify-content-between">
                 <h6 class="text-muted"><i class="bi bi-check2-circle me-2"></i>Attendance Rate</h6>
                 <h4 class="fw-bold text-info">{{ $attendanceRate }}%</h4>
                 <small>This month</small>
@@ -94,48 +99,37 @@
         </div>
     </div>
 
-
+    <!-- MAIN CONTENT -->
     <div class="row g-4">
         <!-- LEFT SIDE -->
-        <div class="col-lg-8">
-            <!-- PAY PERIOD -->
+        <div class="col-12 col-lg-8 d-flex flex-column gap-4">
+
             @php
             use Carbon\Carbon;
             use App\Models\Payroll;
-
-            // Get the logged-in employee
             $employeeId = auth()->user()->employee_id;
-
-            // Current pay period (latest payroll)
-            $currentPayroll = Payroll::where('employee_id', $employeeId)
-                ->latest('pay_period_end')
-                ->first();
-
-            // Recent payslips (last 5)
-            $recentPayslips = Payroll::where('employee_id', $employeeId)
-                ->orderBy('pay_period_end', 'desc')
-                ->take(5)
-                ->get();
+            $currentPayroll = Payroll::where('employee_id', $employeeId)->latest('pay_period_end')->first();
+            $recentPayslips = Payroll::where('employee_id', $employeeId)->orderBy('pay_period_end', 'desc')->take(5)->get();
             @endphp
 
             <!-- PAY PERIOD -->
-            <div class="card shadow-sm border-0 rounded-4 mb-4 p-4">
+            <div class="card shadow-sm border-0 rounded-4 p-3 p-md-4 w-100">
                 <h5 class="fw-bold mb-3">Current Pay Period</h5>
                 @if($currentPayroll)
                     <p class="text-muted mb-4">
                         {{ Carbon::parse($currentPayroll->pay_period_start)->format('m/d/Y') }} - 
                         {{ Carbon::parse($currentPayroll->pay_period_end)->format('m/d/Y') }}
                     </p>
-                    <div class="row text-center">
-                        <div class="col-md-4">
+                    <div class="row text-center g-2">
+                        <div class="col-12 col-md-4">
                             <h6 class="text-muted">Gross Salary</h6>
                             <h4 class="fw-bold text-dark">₱{{ number_format($currentPayroll->basic_salary, 2) }}</h4>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-12 col-md-4">
                             <h6 class="text-muted">Deductions</h6>
                             <h4 class="fw-bold text-danger">₱{{ number_format($currentPayroll->deductions, 2) }}</h4>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-12 col-md-4">
                             <h6 class="text-muted">Net Pay</h6>
                             <h4 class="fw-bold text-success">₱{{ number_format($currentPayroll->net_pay, 2) }}</h4>
                         </div>
@@ -146,46 +140,48 @@
             </div>
 
             <!-- RECENT PAYSLIPS -->
-            <div class="card shadow-sm border-0 rounded-4 mb-4 p-4">
+            <div class="card shadow-sm border-0 rounded-4 p-3 p-md-4 w-100">
                 <h5 class="fw-bold mb-3">Recent Payslips</h5>
-                <table class="table align-middle">
-                    <thead>
-                        <tr class="text-muted small">
-                            <th>Period</th>
-                            <th>Net Amount</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($recentPayslips as $payroll)
-                            <tr>
-                                <td>{{ Carbon::parse($payroll->pay_period_start)->format('M Y') }}</td>
-                                <td>₱{{ number_format($payroll->net_pay, 2) }}</td>
-                                <td>
-                                    @if($payroll->status === 'Paid')
-                                        <span class="badge bg-success">Paid</span>
-                                    @else
-                                        <span class="badge bg-warning text-dark">Pending</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    <a href="javascript:void(0)" class="text-decoration-none me-2 viewPayslipBtn" data-payroll-id="{{ $payroll->payroll_id }}" data-bs-toggle="modal" data-bs-target="#payslipModal">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                                    <a href="{{ route('employee.payslip.download', ['payroll' => $payroll->payroll_id]) }}" class="text-decoration-none" target="_blank">
-                                        <i class="bi bi-download"></i>
-                                    </a>
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0 text-center">
+                        <thead>
+                            <tr class="text-muted small">
+                                <th>Period</th>
+                                <th>Net Amount</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($recentPayslips as $payroll)
+                                <tr>
+                                    <td>{{ Carbon::parse($payroll->pay_period_start)->format('M Y') }}</td>
+                                    <td>₱{{ number_format($payroll->net_pay, 2) }}</td>
+                                    <td>
+                                        @if($payroll->status === 'Paid')
+                                            <span class="badge bg-success">Paid</span>
+                                        @else
+                                            <span class="badge bg-warning text-dark">Pending</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <a href="javascript:void(0)" class="text-decoration-none me-2 viewPayslipBtn" data-payroll-id="{{ $payroll->payroll_id }}" data-bs-toggle="modal" data-bs-target="#payslipModal">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="{{ route('employee.payslip.download', ['payroll' => $payroll->payroll_id]) }}" class="text-decoration-none" target="_blank">
+                                            <i class="bi bi-download"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">No recent payslips available.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
 
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="4" class="text-center text-muted">No recent payslips available.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
                 <!-- Payslip Modal -->
                 <div class="modal fade" id="payslipModal" tabindex="-1" aria-labelledby="payslipModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -200,29 +196,22 @@
                         </div>
                     </div>
                 </div>
-
-                
             </div>
 
-
-            <div class="card shadow-sm border-0 rounded-4 p-4" style="height: 330px;">
+            <!-- ATTENDANCE LOG -->
+            <div class="card shadow-sm border-0 rounded-4 p-3 p-md-4 w-100" style="min-height: 330px;">
                 <h5 class="fw-bold mb-3">Attendance Log</h5>
-
-                <!-- Search Bar -->
-                <div class="mb-3">
-                    <input type="text" id="attendanceSearch" class="form-control form-control-sm" placeholder="Search by date or status...">
-                </div>
-
-                <div class="table-responsive" style="max-height: 310px; overflow-y: auto;">
+                <input type="text" id="attendanceSearch" class="form-control form-control-sm mb-3" placeholder="Search by date or status...">
+                <div class="table-responsive" style="max-height: 310px; overflow-y:auto;">
                     <table class="table mb-0 text-center align-middle" style="border-collapse: separate; border-spacing: 0 0.5rem;">
                         <thead>
                             <tr class="text-muted">
-                                <th class="fw-bold">Date</th>
-                                <th class="fw-bold">Time In</th>
-                                <th class="fw-bold">Time Out</th>
-                                <th class="fw-bold">Total Hours</th>
-                                <th class="fw-bold">Overtime</th>
-                                <th class="fw-bold">Status</th>
+                                <th>Date</th>
+                                <th>Time In</th>
+                                <th>Time Out</th>
+                                <th>Total Hours</th>
+                                <th>Overtime</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody id="attendanceTable">
@@ -256,89 +245,72 @@
                     </table>
                 </div>
             </div>
+
         </div>
 
         <!-- RIGHT SIDE -->
-        <div class="col-lg-4">
+        <div class="col-12 col-lg-4 d-flex flex-column gap-4">
             <!-- LEAVE BALANCE -->
-            <div class="card shadow-sm border-0 rounded-4 mb-4 p-4" style="height: 360px; overflow-y: auto;">
+            <div class="card shadow-sm border-0 rounded-4 p-3 p-md-4 w-100 overflow-auto" style="min-height: 360px;">
                 <h6 class="fw-bold mb-3">Leave Balance</h6>
-
                 @foreach($leaveProgress as $type => $progress)
                     <div class="mb-3">
                         <small>{{ $type }}</small>
-                        <div class="progress" style="height: 6px;">
-                            <div class="progress-bar" role="progressbar"
-                                style="width: {{ $progress['percentage'] }}%;"
-                                aria-valuenow="{{ $progress['used'] }}"
-                                aria-valuemin="0"
-                                aria-valuemax="{{ $progress['total'] }}">
-                            </div>
+                        <div class="progress" style="height:6px;">
+                            <div class="progress-bar" role="progressbar" style="width: {{ $progress['percentage'] }}%;" aria-valuenow="{{ $progress['used'] }}" aria-valuemin="0" aria-valuemax="{{ $progress['total'] }}"></div>
                         </div>
                         <small class="text-muted">{{ $progress['remaining'] }}/{{ $progress['total'] }}</small>
                     </div>
                 @endforeach
             </div>
 
-
-
             <!-- LEAVE REQUESTS -->
-            <div class="card shadow-sm border-0 rounded-4 p-4" style="height: 360px;">
+            <div class="card shadow-sm border-0 rounded-4 p-3 p-md-4 w-100 overflow-auto" style="min-height: 360px;">
                 <h6 class="fw-bold mb-3">Leave Requests</h6>
-
-                <div class="overflow-auto" style="max-height: 340px;">
-                    @forelse($leaveRequests as $leave)
-                        <div class="mb-3 p-3 rounded bg-bold d-flex justify-content-between align-items-start">
-                            <div>
-                                <h6 class="fw-semibold mb-1">{{ $leave->leave_type }}</h6>
-                                <small class="text-muted">
-                                    {{ \Carbon\Carbon::parse($leave->start_date)->format('M d, Y') }}
-                                    @if($leave->start_date != $leave->end_date)
-                                        - {{ \Carbon\Carbon::parse($leave->end_date)->format('M d, Y') }}
-                                    @endif
-                                    • 
-                                    {{ \Carbon\Carbon::parse($leave->start_date)->diffInDays(\Carbon\Carbon::parse($leave->end_date)) + 1 }} day(s)
-                                </small>
-                            </div>
-                            <span class="badge 
-                                @if($leave->status === 'Pending') bg-warning text-dark
-                                @elseif($leave->status === 'Approved') bg-success
-                                @else bg-danger @endif
-                                mt-1">
-                                {{ $leave->status }}
-                            </span>
+                @forelse($leaveRequests as $leave)
+                    <div class="mb-3 p-3 rounded bg-bold d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="fw-semibold mb-1">{{ $leave->leave_type }}</h6>
+                            <small class="text-muted">
+                                {{ \Carbon\Carbon::parse($leave->start_date)->format('M d, Y') }}
+                                @if($leave->start_date != $leave->end_date)
+                                    - {{ \Carbon\Carbon::parse($leave->end_date)->format('M d, Y') }}
+                                @endif
+                                • {{ \Carbon\Carbon::parse($leave->start_date)->diffInDays(\Carbon\Carbon::parse($leave->end_date)) + 1 }} day(s)
+                            </small>
                         </div>
-                    @empty
-                        <p class="text-muted mb-0">No leave requests found.</p>
-                    @endforelse
-                </div>
+                        <span class="badge 
+                            @if($leave->status === 'Pending') bg-warning text-dark
+                            @elseif($leave->status === 'Approved') bg-success
+                            @else bg-danger @endif
+                            mt-1">
+                            {{ $leave->status }}
+                        </span>
+                    </div>
+                @empty
+                    <p class="text-muted mb-0">No leave requests found.</p>
+                @endforelse
             </div>
         </div>
     </div>
 </div>
+
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     document.querySelectorAll('.viewPayslipBtn').forEach(btn => {
         btn.addEventListener('click', function() {
             const payrollId = this.dataset.payrollId;
             const payslipContent = document.getElementById('payslipContent');
-
-            // Show loading text
             payslipContent.innerHTML = '<p class="text-center text-muted">Loading...</p>';
-
-            // Fetch modal content via AJAX
             fetch(`/employeepages/payslip/${payrollId}`)
                 .then(res => res.text())
                 .then(html => payslipContent.innerHTML = html)
                 .catch(() => payslipContent.innerHTML = '<p class="text-danger text-center">Failed to load payslip.</p>');
-
-            // Optional: you can show modal programmatically, but Bootstrap handles it automatically with data-bs-toggle
         });
     });
-});
-const searchInput = document.getElementById('attendanceSearch');
-    const tableRows = document.querySelectorAll('#attendanceTable tr');
 
+    const searchInput = document.getElementById('attendanceSearch');
+    const tableRows = document.querySelectorAll('#attendanceTable tr');
     searchInput.addEventListener('input', function() {
         const filter = this.value.toLowerCase();
         tableRows.forEach(row => {
@@ -346,6 +318,17 @@ const searchInput = document.getElementById('attendanceSearch');
             row.style.display = text.includes(filter) ? '' : 'none';
         });
     });
+});
 </script>
 
+<style>
+.table-responsive {
+    overflow-x: auto;
+}
+@media (max-width: 575.98px) {
+    h3, h4, h5, h6 { font-size: 0.9rem; }
+    .badge { font-size: 0.7rem; }
+    .card p, .card small { font-size: 0.75rem; }
+}
+</style>
 @endsection

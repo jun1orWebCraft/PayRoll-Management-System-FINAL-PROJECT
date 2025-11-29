@@ -1,15 +1,18 @@
 @extends('layouts.employeeapp')
 
 @section('content')
-<div class="container mt-4">
-    <div class="container  mb-5">
-    <div class="d-flex align-items-center justify-content-start mb-4 gap-3">
-    <h3 class="fw-bold mb-0">Leave Request</h3>
-    <div class="d-flex align-items-center justify-content-end gap-2 px-3 py-1 rounded-3 bg-light shadow-sm">
-        <i class="bi bi-clock fs-5 text-secondary"></i>
-        <span class="fw-medium" id="currentDateTime">Nov 6, 2025 10:00 AM</span>
+    <div class="d-flex flex-wrap align-items-center justify-content-between mb-4 gap-3">
+        <!-- Dashboard Title -->
+        <h3 class="fw-bold mb-0">Settings</h3>
+
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <!-- Current Date & Time -->
+            <div class="d-flex align-items-center gap-2 px-2 px-md-3 py-1 rounded-3 bg-bold shadow-sm">
+                <i class="bi bi-clock fs-5 text-secondary"></i>
+                <span class="fw-medium" id="currentDateTime"></span>
+            </div>
+        </div>
     </div>
-</div>
             @if (session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     {{ session('success') }}
